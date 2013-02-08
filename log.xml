@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Conference>
+	<abbreviation>UNICEF</abbreviation>
+	<committee>United Nations Children's Fund</committee>
+	<topic>Test</topic>
+	<Session>
+		<sessionid>1</sessionid>
+		<date>2012-10-21</date>
+		<Dais>
+			<member>
+				<title>Chair</title>
+				<name>Luan Sifei</name>
+			</member>
+			<member>
+				<title>Rapporteur</title>
+				<name>Zheng Qi</name>
+			</member>
+			<member>
+				<title>Director</title>
+				<name>Kong Deyu</name>
+			</member>
+		</Dais>
+		<item id="1">
+			<time>10:00</time>
+			<category>RollCall</category>
+			<data>0</data>
+		</item>
+		<item id="2">
+			<time>10:10</time>
+			<category>Procedure</category>
+			<action>OpenGeneralSpeakersList</action>
+		</item>
+		<item id="3">
+			<time>10:11</time>
+			<category>Procedure</category>
+			<action>AddCountriesToGeneralSpeakersList</action>
+			<countryList>
+				<country>Afghanistan</country>
+				<country>USA</country>
+				<country>Panama</country>
+				<country>Canada</country>
+				<country>Japan</country>
+				<country>ROK</country>
+				<country>Mozambique</country>
+			</countryList>
+		</item>
+		<item id="4">
+			<time>10:13</time>
+			<category>Speech</category>
+			<action>SpeechGSL</action>
+			<speaker>Afghanistan</speaker>
+			<yield>ToChair</yield>
+		</item>
+		<item id="5">
+			<time>10:15</time>
+			<category>Motion</category>
+			<action>ModeratedCaucus</action>
+			<speaker>Saudi Arabia</speaker>
+			<topic>The introduction of Current Situation in some specific nations</topic>
+			<proposedTime>
+				<minute>8</minute>
+			</proposedTime>
+			<proposedTimeEach>
+				<minute>1</minute>
+			</proposedTimeEach>
+			<result>Pass</result>
+			<reason></reason>
+		</item>
+		<Branch>
+			<type>ModeratedCaucus</type>
+			<item id="6">
+				<time>10:18</time>
+				<category>Speech</category>
+				<action>SpeechMC</action>
+				<speaker>Saudi Arabia</speaker>
+			</item>
+		</Branch>
+	</Session>
+</Conference>

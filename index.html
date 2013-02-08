@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Beta 001</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="mun.css">
+    <style type="text/css">
+    #navbar-message {
+      line-height: 24px;
+      font-family: "Segoe UI Light";
+      color: #fff;
+
+    }
+    .navbar-inner {
+      min-height: 30px;
+    }
+    </style>
+    <!-- <link href="css/bootstrap-responsive.css" rel="stylesheet"> -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
+      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
+                    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
+                                   <link rel="shortcut icon" href="ico/favicon.png">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-static-top" id="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <ul class="nav">
+            <li><a href="#" id="global-prompt"></a></li>
+          </ul>
+          <ul class="nav pull-right">
+            <li><a href="#" data-toggle="modal" data-target="#modal-settings">Settings</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container" id="main-container">
+      <div class="row-fluid">
+        <div class="span3 wrapper" id="timeline-wrapper">
+          <div class="wrapper-name">Timeline</div>
+          <ul class="nav nav-list" id="timeline">
+            <li class="nav-header">Session 1</li>
+            <li><a href="#">10:00 RollCall</a></li>
+            <li><a href="#">10:10 OpenGeneralSpeakersList</a></li>
+            <li><a href="#">10:11 AddCountriesToGeneral SpeakersList</a></li>
+            <li><a href="#">10:13 SpeechGSL: Afghanistan</a></li>
+          </ul>
+        </div> <!-- /timeline-wrapper -->
+
+        <div class="span6 wrapper" id="main-wrapper">
+          <div class="wrapper-name">Ongoing: <span id="main-activity-name">Moderated Caucus</span></div>
+          <div id="main-activity">Laos</div>
+          <h1>Test</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eligendi sint repellat odit ex quisquam quos impedit eos vel enim autem molestias ab reiciendis reprehenderit illo rem incidunt consectetur quaerat in.</p>
+          <hr>
+          <p>Moderated Caucus</p>
+        </div> <!-- /main-wrapper -->
+        <div class="span3" id="sidebar-wrapper">
+          <div class="wrapper" id="timer-wrapper">
+            <div class="wrapper-name">Timer</div>
+            <div class="timer" id="global-time">1:25</div>
+            <div id="global-timer-append">Total Time: <span id="global-total-time">9:25</span></div>
+          </div>
+          <div class="wrapper" id="stats-wrapper">
+            <div class="wrapper-name">Session Statistics</div>
+            <dl class="dl-horizontal" id="list-session-stats">
+              <dt>Countries Present</dt>
+              <dd>30</dd>
+              <dt>Simple Majority</dt>
+              <dd>15</dd>
+              <dt>Absolute Majority</dt>
+              <dd>21</dd>
+              <dt>20%</dt>
+              <dd>6</dd>
+            </dl>
+          </div>
+          
+          <a download="somedata.csv" href="data:application/csv;charset=utf-8,Col1%2CCol2%2CCol3%0AVal1%2CVal2%2CVal3%0AVal11%2CVal22%2CVal33%0AVal111%2CVal222%2CVal333">Example Download File</a>
+
+        </div> <!-- /sidebar-wrapper -->
+
+        <div class="wrapper" id="control-wrapper">
+          <div class="wrapper-name">Main Controls</div>
+          
+        
+          <button class="btn btn-primary" id="btn-toggle-fullscreen">Toggle Fullscreen</button>
+          <input type="file" id="input-xml-log"/>
+          <output id="xml-content"></output>
+        </div> <!-- /control-wrapper -->
+
+
+
+      </div> <!-- /row -->
+    </div> <!-- /container -->
+
+    <div class="modal hide fade" id="modal-settings">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3>Global Settings</h3>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal">
+          <div class="control-group">
+            <label for="input-global-prompt" class="control-label">Global Prompt</label>
+            <div class="controls">
+              <input type="text" id="input-global-prompt" class="span4">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <a href="#" class="btn btn-primary" id="submit-global-settings">Save changes</a>
+      </div>
+    </div> <!-- /modal -->
+
+    <script src="js/jquery.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/backbone.js"></script>
+
+    <script src="js/bootstrap.js"></script>
+    <script src="js/screenfull.js"></script>
+
+    <script src="mun.js"></script>
+
+    <script type="text/template" id="template-alert">
+      
+    </script>
+  </body>
+</html>
