@@ -47,6 +47,11 @@
     </nav>
 
     <div class="container" id="main-container">
+      <div class="row">
+        <header class="span12" id="header-wrapper">
+          <h3 id="session-title"><span id="title-committee">United Nations Security Council</span>: Session <span id="title-session-id">1</span></h3>
+        </header>
+      </div>
       <div class="row-fluid">
         <div class="span3 wrapper" id="timeline-wrapper">
           <div class="wrapper-name">Timeline</div>
@@ -61,18 +66,19 @@
 
         <div class="span6 wrapper" id="main-wrapper">
           <div class="wrapper-name">Ongoing: <span id="main-activity-name">Moderated Caucus</span></div>
-          <div id="main-activity">Laos</div>
-          <h1>Test</h1>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eligendi sint repellat odit ex quisquam quos impedit eos vel enim autem molestias ab reiciendis reprehenderit illo rem incidunt consectetur quaerat in.</p>
-          <hr>
-          <p>Moderated Caucus</p>
+          <div id="main-activity">
+            <p>idle</p>
+          </div>
+
         </div> <!-- /main-wrapper -->
+
         <div class="span3" id="sidebar-wrapper">
           <div class="wrapper" id="timer-wrapper">
             <div class="wrapper-name">Timer</div>
             <div class="timer" id="global-time">1:25</div>
             <div id="global-timer-append">Total Time: <span id="global-total-time">9:25</span></div>
-          </div>
+          </div><!-- /timer-wrapper -->
+
           <div class="wrapper" id="stats-wrapper">
             <div class="wrapper-name">Session Statistics</div>
             <dl class="dl-horizontal" id="list-session-stats">
@@ -85,23 +91,24 @@
               <dt>20%</dt>
               <dd>6</dd>
             </dl>
-          </div>
+          </div><!-- /stats-wrapper -->
           
           <a download="somedata.csv" href="data:application/csv;charset=utf-8,Col1%2CCol2%2CCol3%0AVal1%2CVal2%2CVal3%0AVal11%2CVal22%2CVal33%0AVal111%2CVal222%2CVal333">Example Download File</a>
 
         </div> <!-- /sidebar-wrapper -->
+      </div> <!-- /row -->
 
-        <div class="wrapper" id="control-wrapper">
+      <div class="row">
+        <div class="span12 wrapper" id="control-wrapper">
           <div class="wrapper-name">Main Controls</div>
-          
-        
-          <button class="btn btn-primary" id="btn-toggle-fullscreen">Toggle Fullscreen</button>
+          <button class="btn btn-info btn-large" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize</button>
+          <button class="btn btn-primary btn-large" id="btn-roll-call">Roll Call</button>
+          <hr>
+
+          <button class="btn btn-primary" id="btn-toggle-fullscreen">Fullscreen Mode</button>
           <input type="file" id="input-xml-log"/>
           <output id="xml-content"></output>
         </div> <!-- /control-wrapper -->
-
-
-
       </div> <!-- /row -->
     </div> <!-- /container -->
 
@@ -111,18 +118,83 @@
         <h3>Global Settings</h3>
       </div>
       <div class="modal-body">
-        <form class="form-horizontal">
-          <div class="control-group">
-            <label for="input-global-prompt" class="control-label">Global Prompt</label>
-            <div class="controls">
-              <input type="text" id="input-global-prompt" class="span4">
+          <ul id="modal-settings-tabs" class="nav nav-tabs">
+            <li class="active"><a href="#modal-settings-general" data-toggle="tab">General</a></li>
+            <li><a href="#modal-settings-profile" data-toggle="tab">Profile</a></li>
+          </ul>
+          <div id="modal-settings-content" class="tab-content">
+            <div class="tab-pane fade in active" id="modal-settings-modal-settings-general">
+              <form class="form-horizontal">
+                <div class="control-group">
+                  <label for="input-global-prompt" class="control-label">Global Prompt</label>
+                  <div class="controls">
+                    <input type="text" id="input-global-prompt" class="span4">
+                  </div>
+                </div>
+              </form>
             </div>
-          </div>
-        </form>
+            <div class="tab-pane fade" id="modal-settings-profile">
+              <p>Hello</p>
+            </div>
+          </div><!-- /tab-content -->
       </div>
       <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Close</a>
         <a href="#" class="btn btn-primary" id="submit-global-settings">Save changes</a>
+      </div>
+    </div> <!-- /modal -->
+
+    <div class="modal hide fade" id="modal-init">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3>Session Initialization</h3>
+      </div>
+      <div class="modal-body">
+          <ul id="modal-init-tabs" class="nav nav-tabs">
+            <li class="active"><a href="#modal-init-general" data-toggle="tab">General</a></li>
+            <li><a href="#modal-init-advanced" data-toggle="tab">Advanced</a></li>
+          </ul>
+          <div id="modal-init-content" class="tab-content">
+            <div class="tab-pane fade in active" id="modal-init-general">
+              <form class="form-horizontal">
+                <div class="control-group">
+                  <label for="init-committee" class="control-label">Committee</label>
+                  <div class="controls">
+                    <input type="text" id="init-committee" class="span3">
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label for="init-abbr" class="control-label">Abbreviation</label>
+                  <div class="controls">
+                    <input type="text" id="init-abbr" class="span3">
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label for="init-topic" class="control-label">Topic</label>
+                  <div class="controls">
+                    <input type="text" id="init-topic" class="span3">
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label for="init-sessionid" class="control-label">Session ID</label>
+                  <div class="controls">
+                    <input type="text" id="init-sessionid" class="span3" value="1">
+                  </div>
+                </div>
+              </form>
+              <div class="modal-form-second-row">
+                <label for="init-country-list">Country List</label>
+                <textarea id="init-country-list" class="span4" rows="10"></textarea>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="modal-init-advanced">
+              <p>Hello</p>
+            </div>
+          </div><!-- /tab-content -->
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <a href="#" class="btn btn-info" id="submit-init">Initialize Session</a>
       </div>
     </div> <!-- /modal -->
 
@@ -134,6 +206,12 @@
     <script src="js/screenfull.js"></script>
 
     <script src="mun.js"></script>
+    <script>
+    $(function(){
+
+    });
+    
+    </script>
 
     <script type="text/template" id="template-alert">
       

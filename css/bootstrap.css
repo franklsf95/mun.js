@@ -205,7 +205,7 @@ textarea {
 }
 body {
   margin: 0;
-  font-family: "Segoe UI", Calibri, Candara, Arial, sans-serif;
+  font-family: Helvetica, "Segoe UI", Calibri, Candara, Arial, sans-serif;
   font-size: 14px;
   line-height: 20px;
   color: #555555;
@@ -873,7 +873,7 @@ input,
 button,
 select,
 textarea {
-  font-family: "Segoe UI", Calibri, Candara, Arial, sans-serif;
+  font-family: Helvetica, "Segoe UI", Calibri, Candara, Arial, sans-serif;
 }
 label {
   display: block;
@@ -3729,7 +3729,7 @@ input[type="submit"].btn.btn-mini {
 .navbar-search .search-query {
   margin-bottom: 0;
   padding: 4px 14px;
-  font-family: "Segoe UI", Calibri, Candara, Arial, sans-serif;
+  font-family: Helvetica, "Segoe UI", Calibri, Candara, Arial, sans-serif;
   font-size: 13px;
   font-weight: normal;
   line-height: 1;
