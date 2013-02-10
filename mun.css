@@ -35,8 +35,9 @@
    Session Title Module
  -----------------------------*/
 #session-title {
-  font-weight: 400;
+  font-weight: normal;
   line-height: 20px;
+  color: #65b;
   padding: 8px 0;
 }
 
