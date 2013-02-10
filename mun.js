@@ -58,6 +58,36 @@ $(function() {
         }
     });
 
+    var TimerView = Backbone.View.extend({
+        $etimer: $("#global-timer"),
+        el: $("#timer-wrapper"),
+        running: false,
+        events: {
+            "click #btn-timer-toggle": "toggle",
+            "click #btn-timer-reset": "reset"
+        },
+        initialize: function() {
+            this.$etimer.timer({
+                time: 8
+            });
+        },
+        toggle: function() {
+            if (this.running) {
+                this.$etimer.timer('stop');
+                this.running = false;
+                $("#btn-timer-toggle").html("Continue");
+            } else {
+                this.$etimer.timer('start');
+                $("#btn-timer-toggle").html("Pause");
+                this.running = true;
+            }
+        },
+        reset: function() {
+            this.$etimer.timer('reset');
+            log('Timer reset', DEBUG);
+        }
+    });
+
     var ControlView = Backbone.View.extend({
         el: $("#control-wrapper"),
         initialize: function() {
@@ -94,16 +124,6 @@ $(function() {
         }
     });
 
-    var SettingsView = Backbone.View.extend({
-        el: $("#modal-settings"),
-        events: {
-            "click #submit-global-settings": "saveGlobalSettings"
-        },
-        saveGlobalSettings: function() {
-            settingsController.set('globalPrompt', $("#input-global-prompt").val());
-        }
-    });
-
     var SettingsController = Backbone.Model.extend({
         initialize: function() {
             this.initializeGlobal();
@@ -124,6 +144,7 @@ $(function() {
             'countryList': [],
             'presentList': [],
             'sessionStats': {},
+            'sessionInfo': {},
             'ongoing': 'idle'
         },
         initialize: function() {
@@ -160,7 +181,17 @@ $(function() {
         }
     });
 
-    var InitView = Backbone.View.extend({
+    var SettingsModelView = Backbone.View.extend({
+        el: $("#modal-settings"),
+        events: {
+            "click #submit-global-settings": "saveGlobalSettings"
+        },
+        saveGlobalSettings: function() {
+            settingsController.set('globalPrompt', $("#input-global-prompt").val());
+        }
+    });
+
+    var InitModelView = Backbone.View.extend({
         el: $("#modal-init"),
         events: {
             "click #submit-init": "initializeSession"
@@ -177,7 +208,7 @@ $(function() {
             sessionController.set( {
                 'sessionInfo': {
                     'committee': $("#init-committee").val(),
-                    'abbreviation': $("#init-abbr").val(),
+                    'abbr': $("#init-abbr").val(),
                     'topic': $("#init-topic").val(),
                     'sessionid': $("#init-sessionid").val()
                     },
@@ -190,6 +221,7 @@ $(function() {
     var AppView = Backbone.View.extend({
         initialize: function() {
             this.listenTo(sessionController, "change:ongoing", this.render);
+            this.listenTo(sessionController, "change:sessionInfo", this.renderTitle);
             this.render();
             //initialize XML FileReader
             if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
@@ -198,6 +230,11 @@ $(function() {
         },
         render: function() {
             $("#main-activity-name").html(sessionController.get("ongoing"));
+        },
+        renderTitle: function() {
+            $("#title-committee").html(sessionController.get('sessionInfo')['committee']);
+            $("#title-abbr").html(sessionController.get('sessionInfo')['abbr']);
+            $("#title-sessionid").html(sessionController.get('sessionInfo')['sessionid']);
         },
         enable: function(id) {
             $('#' + id).removeAttr('disabled');
@@ -215,10 +252,11 @@ $(function() {
     var settingsController = new SettingsController();
     var sessionController = new SessionController();
 
+    var timerView = new TimerView();
     var statsView = new StatsView();
     var controlView = new ControlView();
-    var initView = new InitView();
-    var settingsView = new SettingsView();
+    var initView = new InitModelView();
+    var settingsView = new SettingsModelView();
     var appView = new AppView();
     //warn('mun.js successfully initialized!', 'success');
 

@@ -49,7 +49,7 @@
     <div class="container" id="main-container">
       <div class="row">
         <header class="span12" id="header-wrapper">
-          <div id="session-title"><span id="title-committee">United Nations Security Council</span>: Session <span id="title-session-id">1</span></div>
+          <div id="session-title"><span id="title-committee"></span> (<span id="title-abbr"></span>): Session <span id="title-sessionid"></span></div>
         </header>
       </div>
       <div class="row-fluid">
@@ -75,8 +75,12 @@
         <div class="span3" id="sidebar-wrapper">
           <div class="wrapper" id="timer-wrapper">
             <div class="wrapper-name">Timer</div>
-            <div class="timer" id="global-time">1:25</div>
-            <div id="global-timer-append">Total Time: <span id="global-total-time">9:25</span></div>
+            <div class="timer" id="global-timer"></div>
+            <div id="global-timer-append">
+              <div>Total Time: <span id="global-total-time">9:25</span></div>
+              <button class="btn btn-inverse" id="btn-timer-toggle">Continue</button>
+              <button class="btn btn-danger" id="btn-timer-reset">Reset</button>
+            </div>
           </div><!-- /timer-wrapper -->
 
           <div class="wrapper" id="stats-wrapper">
@@ -151,13 +155,13 @@
                 <div class="control-group">
                   <label for="init-committee" class="control-label">Committee</label>
                   <div class="controls">
-                    <input type="text" id="init-committee" class="span3">
+                    <input type="text" id="init-committee" class="span3" value="United Nations Security Council">
                   </div>
                 </div>
                 <div class="control-group">
                   <label for="init-abbr" class="control-label">Abbreviation</label>
                   <div class="controls">
-                    <input type="text" id="init-abbr" class="span3">
+                    <input type="text" id="init-abbr" class="span3" value="UNSC">
                   </div>
                 </div>
                 <div class="control-group">
@@ -194,7 +198,7 @@ USA</textarea>
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
         <a href="#" class="btn btn-info" id="submit-init">Initialize Session</a>
       </div>
-      
+
     </div> <!-- /modal -->
 
     <script src="js/jquery.js"></script>
@@ -203,12 +207,11 @@ USA</textarea>
 
     <script src="js/bootstrap.js"></script>
     <script src="js/screenfull.js"></script>
+    <script src="js/jquery.timer.js"></script>
 
     <script src="mun.js"></script>
     <script>
-    $(function(){
-      
-    });    
+
     </script>
 
     <script type="text/template" id="template-alert">

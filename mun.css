@@ -42,6 +42,9 @@
 /*----------------------------
    Timeline Module
  -----------------------------*/
+/*#timeline-wrapper {
+  background-color: #ebf5ff;
+}*/
 #timeline {
   padding: 0 5px;
 }
@@ -59,15 +62,19 @@
    Timer Module
  -----------------------------*/
 #timer-wrapper {
-  height: 110px;
+  height: 130px;
 }
 
 .timer {
+  margin-top: 22px;
   font-size: 80px;
   font-family: "Helvetica Neue", "Segoe UI Light";
   text-align: center;
-  padding-top: 22px;
   color: #000;
+}
+
+.timer-warning {
+  color: #f00;
 }
 
 #global-timer-append {
@@ -118,7 +125,7 @@
    Roll Call View
  -----------------------------*/
 .roll-call-view {
-  background-color: #ccc;
+  background-color: #ebf5ff;
 }
 
 .roll-call-view .roll-call-current {
