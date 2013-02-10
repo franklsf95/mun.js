@@ -1,16 +1,60 @@
 $(function() {
-    var DEBUG = 0;
+    var DEBUG = 0, PRODUCT = 1;
 
     var RollCallView = Backbone.View.extend({
         el: $("#main-activity"),
+        events: {
+            "click #btn-roll-call-present": "countryPresent",
+            "click #btn-roll-call-absent":  "countryAbsent"
+        },
+        current: 0,
+        countryList: [],
         initialize: function() {
+            this.countryList = sessionController.get('countryList');
+
+            sessionController.set('ongoing', 'Roll Call');
+            Backbone.$("#main-wrapper").addClass("roll-call-view");
             this.render();
             log('Roll Call View initialized.', DEBUG);
         },
         render: function() {
-            this.$el.html('<h1>Roll Call</h1>');
-            Backbone.$("#main-wrapper").removeClass("span6").addClass("span9");
-            Backbone.$("#sidebar-wrapper").hide();
+            var content;
+            if (this.current == this.countryList.length) {
+                this.terminate();
+            } else {
+                content = '<div class="roll-call-current">' + this.countryList[this.current] + '</div>';
+                content += '<button class="btn btn-success" id="btn-roll-call-present">Present (P)</button><button class="btn btn-warning" id="btn-roll-call-absent">Absent (A)</button>';
+                content += '<ul>';
+                var more = true;
+                for (var i = this.current + 1; i < this.current + 5; i++ ) {
+                    if (i == this.countryList.length) {
+                        more = false;
+                        break;
+                    }
+                    content += '<li class="roll-call-country">' + this.countryList[i] + '</li>';
+                }
+                if (more) content += '<li>...</li>';
+                content += '</ul>';
+            }
+            this.$el.html(content);//.focus();
+            return this;
+        },
+        countryPresent: function() {
+            log(this.countryList[this.current] + ' is present.', PRODUCT);
+            sessionController.addPresentCountry(this.countryList[this.current]);
+            this.current++;
+            this.render();
+        },
+        countryAbsent: function() {
+            log(this.countryList[this.current] + ' is absent.', PRODUCT);
+            this.current++;
+            this.render();
+        },
+        terminate: function() {
+            Backbone.$("#main-wrapper").removeClass("roll-call-view");
+            sessionController.set('ongoing', 'idle');
+            this.$el.html('');
+            notice('Roll Call completed.', 'success');
         }
     });
 
@@ -36,7 +80,6 @@ $(function() {
         },
         launchRollCall: function() {
             var rollCallView = new RollCallView();
-            sessionController.set('ongoing', 'Roll Call');
         },
         readXMLFile: function(e) {
             var file = e.target.files[0];
@@ -70,7 +113,6 @@ $(function() {
             'globalPrompt': 'This is a development version of mun.js'
         },
         initializeGlobal: function() {
-            log(this);
             $("#global-prompt").html(this.get('globalPrompt'));
             //write to config modal
             $("#input-global-prompt").val(this.get('globalPrompt'));
@@ -95,6 +137,10 @@ $(function() {
                 'Absolute Majority': Math.floor(present * 2 / 3) + 1,
                 '20% Present Count': Math.round(present / 5)
             });
+        },
+        addPresentCountry: function(country) {
+            this.get('presentList').push(country);
+            this.trigger("change:presentList"); // workaround for pushing an element != change an array
         }
     });
 
@@ -160,6 +206,10 @@ $(function() {
         disable: function(id) {
             $('#' + id).attr('disabled', 1);
             log(id + ' disabled', DEBUG);
+        },
+        enlarge: function() {
+            $("#main-wrapper").removeClass("span6").addClass("span9");
+            $("#sidebar-wrapper").hide();
         }
     });
     var settingsController = new SettingsController();
@@ -170,8 +220,10 @@ $(function() {
     var initView = new InitView();
     var settingsView = new SettingsView();
     var appView = new AppView();
+    //warn('mun.js successfully initialized!', 'success');
 
-    sessionController.set('presentList', ['China', 'France', 'Russia', 'USA', 'UK'] );
+    initView.initializeSession();
+    controlView.launchRollCall();
 });
 
 
@@ -179,10 +231,22 @@ function log(str, level) {
     console.log(str);
 }
 
-function warn(s) {
-    var con = '<div class="alert">'+
-        '<button class="close" data-dismiss="alert">&times;</button>'+
-        '<strong>Warning! </strong>' + s +
-        '</div>';
-    $("#main-container").prepend(con);
+function warn(s, type) {
+    var con = '<div class="alert';
+    if (type) con += ' alert-' + type;
+    con += '">' +
+        '<button class="close" data-dismiss="alert">&times;</button>';
+    if (!type) con += '<strong>Warning! </strong>';
+    con += s + '</div>';
+    $(con).prependTo($("#main-container")).hide().slideDown();
+}
+
+function notice(s, type) {
+    var con = '<div class="alert';
+    if (type) con += ' alert-' + type;
+    con += '">' +
+        '<button class="close" data-dismiss="alert">&times;</button>';
+    if (!type) con += '<strong>Warning! </strong>';
+    con += s + '</div>';
+    $(con).prependTo($("#main-wrapper")).hide().fadeIn();
 }

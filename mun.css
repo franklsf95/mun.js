@@ -35,10 +35,8 @@
    Session Title Module
  -----------------------------*/
 #session-title {
-  font-weight: normal;
-  line-height: 20px;
-  color: #65b;
-  padding: 8px 0;
+  font-size: 12px;
+  font-family: monospace;
 }
 
 /*----------------------------
@@ -54,8 +52,6 @@
   font-weight: bold;
 }
 #main-activity {
-  font-size: 100px;
-  line-height: 150px;
   text-align: center;
 }
 
@@ -70,7 +66,7 @@
   font-size: 80px;
   font-family: "Helvetica Neue", "Segoe UI Light";
   text-align: center;
-  padding-top: 28px;
+  padding-top: 22px;
   color: #000;
 }
 
@@ -116,4 +112,32 @@
 }
 #modal-init > .modal-body {
   max-height: 600px;
+}
+
+/*----------------------------
+   Roll Call View
+ -----------------------------*/
+.roll-call-view {
+  background-color: #ccc;
+}
+
+.roll-call-view .roll-call-current {
+  font-size: 80px;
+  line-height: 88px;
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.roll-call-view button {
+  width: 100px;
+}
+
+.roll-call-view ul {
+  margin-top: 20px;
+}
+
+.roll-call-view li {
+  list-style: none;
+  font-size: 28px;
+  line-height: 32px;
 }

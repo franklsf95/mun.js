@@ -49,7 +49,7 @@
     <div class="container" id="main-container">
       <div class="row">
         <header class="span12" id="header-wrapper">
-          <h3 id="session-title"><span id="title-committee">United Nations Security Council</span>: Session <span id="title-session-id">1</span></h3>
+          <div id="session-title"><span id="title-committee">United Nations Security Council</span>: Session <span id="title-session-id">1</span></div>
         </header>
       </div>
       <div class="row-fluid">
@@ -82,14 +82,7 @@
           <div class="wrapper" id="stats-wrapper">
             <div class="wrapper-name">Session Statistics</div>
             <dl class="dl-horizontal" id="list-session-stats">
-              <dt>Countries Present</dt>
-              <dd>30</dd>
-              <dt>Simple Majority</dt>
-              <dd>15</dd>
-              <dt>Absolute Majority</dt>
-              <dd>21</dd>
-              <dt>20%</dt>
-              <dd>6</dd>
+              <p>Roll Call not started.</p>
             </dl>
           </div><!-- /stats-wrapper -->
           
@@ -98,18 +91,16 @@
         </div> <!-- /sidebar-wrapper -->
       </div> <!-- /row -->
 
-      <div class="row">
-        <div class="span12 wrapper" id="control-wrapper">
-          <div class="wrapper-name">Main Controls</div>
-          <button class="btn btn-info btn-large" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize</button>
-          <button class="btn btn-primary btn-large" id="btn-roll-call">Roll Call</button>
-          <hr>
+      <div class="wrapper" id="control-wrapper">
+        <div class="wrapper-name">Main Controls</div>
+        <button class="btn btn-info btn-large" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize</button>
+        <button class="btn btn-primary btn-large" id="btn-roll-call" disabled>Roll Call</button>
+        <hr>
 
-          <button class="btn btn-primary" id="btn-toggle-fullscreen">Fullscreen Mode</button>
-          <input type="file" id="input-xml-log"/>
-          <output id="xml-content"></output>
-        </div> <!-- /control-wrapper -->
-      </div> <!-- /row -->
+        <button class="btn btn-primary" id="btn-toggle-fullscreen">Fullscreen Mode</button>
+        <input type="file" id="input-xml-log"/>
+        <output id="xml-content"></output>
+      </div> <!-- /control-wrapper -->
     </div> <!-- /container -->
 
     <div class="modal hide fade" id="modal-settings">
@@ -184,7 +175,14 @@
               </form>
               <div class="modal-form-second-row">
                 <label for="init-country-list">Country List</label>
-                <textarea id="init-country-list" class="span4" rows="10"></textarea>
+                <textarea id="init-country-list" class="span4" rows="10">
+China
+France
+Japan
+Korea
+Russia
+UK
+USA</textarea>
               </div>
             </div>
             <div class="tab-pane fade" id="modal-init-advanced">
@@ -196,6 +194,7 @@
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
         <a href="#" class="btn btn-info" id="submit-init">Initialize Session</a>
       </div>
+      
     </div> <!-- /modal -->
 
     <script src="js/jquery.js"></script>
@@ -208,9 +207,8 @@
     <script src="mun.js"></script>
     <script>
     $(function(){
-
-    });
-    
+      
+    });    
     </script>
 
     <script type="text/template" id="template-alert">
