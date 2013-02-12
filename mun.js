@@ -3,19 +3,43 @@ $(function() {
 
     var SpeakersList = Backbone.Model.extend({
         defaults: {
-            'list': [],
+            'list': [1,2,3],
             'current': 0
         },
-        initialize: function() {
-            log('\tSpeakersList created.', DEBUG);
+        initialize: function(arr) {
+            log('@ Object SpeakersList created.', DEBUG);
+            if (arr !== undefined)
+                this.set('list', arr);
+        },
+        push: function(s) {
+            this.get('list').push(s);
+            log(this.get('list'));
+            return this;
+        },
+        next: function() {
+            if (this.get('current') == this.get('list').length - 1)
+                return -1;
+            this.set('current', this.get('current') + 1);
+            return this.get('list')[this.get('current') - 1];
         }
     });
 
     var GSLView = Backbone.View.extend({
         el: $("#main-activity"),
         initialize: function() {
-            var gsl = new SpeakersList();
-            sessionController.register("General Speaker's List", 'gsl-view');
+            log(this.model);
+            this.model.push('China').push('USA');
+            sessionController.register(this, "General Speaker's List", 'gsl-view');
+        },
+        render: function() {
+            var content = '<ul>';
+            _(this.model.get('list')).each( function( value ) {
+                content += '<li>' + value + '</li>';
+            });
+            content += '</ul>';
+
+            this.$el.html(content);
+            return this;
         }
     });
 
@@ -29,9 +53,8 @@ $(function() {
         countryList: [],
         initialize: function() {
             this.countryList = sessionController.get('countryList');
-            sessionController.register('Roll Call', 'roll-call-view');
-            this.render();
-            log('RollCallView initialized.', DEBUG);
+            sessionController.register(this, 'Roll Call', 'roll-call-view');
+            log('$ RollCallView initialized.', DEBUG);
         },
         render: function() {
             var content;
@@ -67,9 +90,7 @@ $(function() {
             this.render();
         },
         terminate: function() {
-            Backbone.$("#main-wrapper").removeClass("roll-call-view");
-            sessionController.set('ongoing', 'idle');
-            this.$el.html('');
+            sessionController.unregister('roll-call-view');
             notice('Roll Call completed.', 'success');
             log('RollCallView terminated.', DEBUG);
         }
@@ -87,7 +108,7 @@ $(function() {
             this.$etimer.timer({
                 time: 8
             });
-            log('TimerView initialized.', DEBUG);
+            log('$ TimerView initialized.', DEBUG);
         },
         toggle: function() {
             if (this.running) {
@@ -109,7 +130,7 @@ $(function() {
     var ControlView = Backbone.View.extend({
         el: $("#control-wrapper"),
         initialize: function() {
-            log('ControlView initialized.', DEBUG);
+            log('$ ControlView initialized.', DEBUG);
         },
         events: {
             "click #btn-toggle-fullscreen": "toggleFullscreen",
@@ -131,7 +152,7 @@ $(function() {
             var rollCallView = new RollCallView();
         },
         openGSL: function() {
-            var gslView = new GSLView();
+            var gslView = new GSLView({model: new SpeakersList()});
         },
         readXMLFile: function(e) {
             var file = e.target.files[0];
@@ -150,7 +171,7 @@ $(function() {
         initialize: function() {
             this.initializeGlobal();
             this.on("change", this.initializeGlobal);
-            log('\tSettingsController created.', DEBUG);
+            log('@ Object SettingsController created.', DEBUG);
         },
         defaults: {
             'globalPrompt': 'This is a development version of mun.js'
@@ -168,18 +189,42 @@ $(function() {
             'presentList': [],
             'sessionStats': {},
             'sessionInfo': {},
-            'ongoing': 'idle',
-            'ongoingClass': '',
+            'ongoing': {
+                view: null,
+                name: 'idle',
+                cls: 'idle'
+            },
             'threadStack': []
         },
         initialize: function() {
             this.on("change:presentList", this.calculate);
-            log('\tSessionController created.', DEBUG);
+            log('@ Object SessionController created.', DEBUG);
         },
-        register: function(name, cls) {
-            this.get('threadStack').push( new Array(this.get('ongoing'), this.get('ongoingClass')) );
-            log(this.get('threadStack'), DEBUG);
-            this.set({'ongoing': name, 'ongoingClass': cls});
+        register: function(view, name, cls) {
+            this.get('threadStack').push( this.get('ongoing') );
+            this.unregister(this.get('ongoing').cls); //?? is this really necessary??
+            this.set('ongoing', {
+                'view': view,
+                'name': name,
+                'cls': cls
+            });
+            this.logStack(0);
+            view.render();
+            return this;
+        },
+        unregister: function(cls) {
+            if (this.get('ongoing').cls != cls || cls == 'idle')
+                return this;
+
+            appView.unrender(cls);
+            var old = this.get('threadStack').pop();
+            this.set('ongoing', {
+                'view': old.view,
+                'name': old.name,
+                'cls': old.cls
+            });
+            this.logStack(1);
+            return this;
         },
         calculate: function() {
             var present = this.get('presentList').length;
@@ -193,6 +238,13 @@ $(function() {
         addPresentCountry: function(country) {
             this.get('presentList').push(country);
             this.trigger("change:presentList"); // workaround for pushing an element != change an array
+        },
+        logStack: function(unreg) {
+            log(unreg ? '>>\tThread popped out' : '>>\tThread pushed in.');
+            log('>>\tThread Stack:');
+            _(this.get('threadStack')).each( function(o) {
+                log('\t\t' + o.view + '\t' + o.name + '\t' + o.cls, DEBUG);
+            });
         }
     });
 
@@ -200,7 +252,7 @@ $(function() {
         el: $("#list-session-stats"),
         initialize: function(){
             this.listenTo(sessionController, "change:sessionStats", this.render);
-            log('StatsView initialized.', DEBUG);
+            log('$ StatsView initialized.', DEBUG);
         },
         render: function(){
             this.$el.html("");
@@ -216,7 +268,7 @@ $(function() {
     var SettingsModelView = Backbone.View.extend({
         el: $("#modal-settings"),
         initialize: function() {
-            log('SettingsModelView initialized.', DEBUG);
+            log('$ SettingsModelView initialized.', DEBUG);
         },
         events: {
             "click #submit-global-settings": "saveGlobalSettings"
@@ -232,7 +284,7 @@ $(function() {
             "click #submit-init": "initializeSession"
         },
         initialize: function(){
-            log('InitModelView initialized.', DEBUG);
+            log('$ InitModelView initialized.', DEBUG);
             //this.listenTo(sessionController, "change:sessionInfo change:countryList", this.render);
         },
         render: function(){
@@ -256,19 +308,21 @@ $(function() {
 
     var AppView = Backbone.View.extend({
         initialize: function() {
-            this.listenTo(sessionController, "change:ongoing change:ongoingClass", this.render);
+            this.listenTo(sessionController, "change:ongoing", this.render);
             this.listenTo(sessionController, "change:sessionInfo", this.renderTitle);
             this.render();
             //initialize XML FileReader
-            log('AppView initialized.', DEBUG);
+            log('$ AppView initialized.', DEBUG);
             if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
                 warn('XML File Processing Function not available.');
             }
         },
-        render: function() {
-            $("#main-activity-name").html(sessionController.get("ongoing"));
-            $("#main-wrapper").addClass(sessionController.get("ongoingClass"));
-            //log(sessionController.get("threadStack"), DEBUG);
+        render: function(name, cls) {
+            $("#main-activity-name").html(sessionController.get('ongoing').name);
+            $("#main-wrapper").addClass(sessionController.get('ongoing').cls);
+        },
+        unrender: function(cls) {
+            $("#main-wrapper").removeClass(cls);
         },
         renderTitle: function() {
             $("#title-committee").html(sessionController.get('sessionInfo')['committee']);
@@ -297,7 +351,7 @@ $(function() {
     var initView = new InitModelView();
     var settingsView = new SettingsModelView();
     var appView = new AppView();
-    //warn('mun.js successfully initialized!', 'success');
+    //warn('$ mun.js successfully initialized.', 'success');
 
     initView.initializeSession();
     controlView.launchRollCall();
