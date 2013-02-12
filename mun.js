@@ -3,8 +3,9 @@ $(function() {
 
     var SpeakersList = Backbone.Model.extend({
         defaults: {
-            'list': [1,2,3],
-            'current': 0
+            'list': [],
+            'current': 0,
+            'time': 120
         },
         initialize: function(arr) {
             log('@ Object SpeakersList created.', DEBUG);
@@ -12,34 +13,79 @@ $(function() {
                 this.set('list', arr);
         },
         push: function(s) {
+            if (s === '' || s === null || s === undefined) return this;
             this.get('list').push(s);
-            log(this.get('list'));
+            this.trigger('change:list');
             return this;
         },
         next: function() {
             if (this.get('current') == this.get('list').length - 1)
                 return -1;
             this.set('current', this.get('current') + 1);
-            return this.get('list')[this.get('current') - 1];
+            return this.get('list')[this.get('current')];
         }
     });
 
     var GSLView = Backbone.View.extend({
         el: $("#main-activity"),
+        events: {
+            "keypress": "enterHandler",
+            "click #btn-gsl-next": "nextCountry"
+        },
         initialize: function() {
-            log(this.model);
             this.model.push('China').push('USA');
+            this.listenTo(this.model, 'change:list', this.renderList);
+            this.listenTo(this.model, 'change:time', this.renderTimer);
             sessionController.register(this, "General Speaker's List", 'gsl-view');
+
+            // $theModal = $( $("#tpl-init-sl").html().replace('\n', '') );
+            // $theModal.appendTo($("body")).attr("id", "modal-ha");
         },
         render: function() {
-            var content = '<ul>';
-            _(this.model.get('list')).each( function( value ) {
-                content += '<li>' + value + '</li>';
-            });
-            content += '</ul>';
-
+            var content = '<div class="highlight-country">' + this.model.get('list')[this.model.get('current')] + '</div>';
+            content += '<hr>';
+            content += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="Enter to Add Country"><button id="btn-gsl-next" class="btn btn-primary">Next Speaker</button>';
             this.$el.html(content);
+            $("#sl-add-country").tooltip({'trigger': 'focus'});
+            this.renderList();
+            this.renderTimer();
             return this;
+        },
+        renderList: function() {
+            $(".pending-country-list").remove();
+            var list = this.model.get('list');
+            var content = '<ul class="pending-country-list">';
+            for (var i = this.model.get('current') + 1; i < list.length; i++) {
+                content += '<li>' + list[i] + '</li>';
+            }
+            content += '</ul>';
+            this.$el.append(content);
+            return this;
+        },
+        renderTimer: function() {
+            timerView.setTime(this.model.get('time'));
+        },
+        enterHandler: function(e) {
+            if (e.keyCode == 13) {
+                var country = $("#sl-add-country").val();
+                this.model.push(country);
+                $("#sl-add-country").val("").focus();
+            }
+        },
+        nextCountry: function() {
+            var c = this.model.next();
+            if (c == -1) {
+                this.terminate();
+            } else {
+                $(".highlight-country").html(c);
+                this.renderList();
+                return this;
+            }
+        },
+        terminate: function() {
+            sessionController.unregister('gsl-view');
+            notice('General Speaker\'s List exhausted.', 'info');
+            log('GSLView terminated.', DEBUG);
         }
     });
 
@@ -61,16 +107,16 @@ $(function() {
             if (this.current == this.countryList.length) {
                 this.terminate();
             } else {
-                content = '<div class="roll-call-current">' + this.countryList[this.current] + '</div>';
+                content = '<div class="highlight-country">' + this.countryList[this.current] + '</div>';
                 content += '<button class="btn btn-success" id="btn-roll-call-present">Present (P)</button><button class="btn btn-warning" id="btn-roll-call-absent">Absent (A)</button>';
-                content += '<ul>';
+                content += '<ul class="pending-country-list">';
                 var more = true;
                 for (var i = this.current + 1; i < this.current + 5; i++ ) {
                     if (i == this.countryList.length) {
                         more = false;
                         break;
                     }
-                    content += '<li class="roll-call-country">' + this.countryList[i] + '</li>';
+                    content += '<li>' + this.countryList[i] + '</li>';
                 }
                 if (more) content += '<li>...</li>';
                 content += '</ul>';
@@ -96,6 +142,18 @@ $(function() {
         }
     });
 
+    var IdleView = Backbone.View.extend({
+        el: $("#main-activity"),
+        initialize: function() {
+            this.render();
+        },
+        render: function() {
+            log("IdleView rendered.", DEBUG);
+            this.$el.html('<p>idle</p>');
+            return this;
+        }
+    });
+
     var TimerView = Backbone.View.extend({
         $etimer: $("#global-timer"),
         el: $("#timer-wrapper"),
@@ -109,6 +167,9 @@ $(function() {
                 time: 8
             });
             log('$ TimerView initialized.', DEBUG);
+        },
+        setTime: function(t) {
+            this.$etimer.timer({time: t});
         },
         toggle: function() {
             if (this.running) {
@@ -152,7 +213,8 @@ $(function() {
             var rollCallView = new RollCallView();
         },
         openGSL: function() {
-            var gslView = new GSLView({model: new SpeakersList()});
+            var gsl = new SpeakersList();
+            var gslView = new GSLView({model: gsl});
         },
         readXMLFile: function(e) {
             var file = e.target.files[0];
@@ -190,7 +252,7 @@ $(function() {
             'sessionStats': {},
             'sessionInfo': {},
             'ongoing': {
-                view: null,
+                view: new IdleView(),
                 name: 'idle',
                 cls: 'idle'
             },
@@ -208,7 +270,7 @@ $(function() {
                 'name': name,
                 'cls': cls
             });
-            this.logStack(0);
+            this.logStack(0, cls);
             view.render();
             return this;
         },
@@ -223,7 +285,8 @@ $(function() {
                 'name': old.name,
                 'cls': old.cls
             });
-            this.logStack(1);
+            old.view.render();
+            this.logStack(1, cls);
             return this;
         },
         calculate: function() {
@@ -239,8 +302,8 @@ $(function() {
             this.get('presentList').push(country);
             this.trigger("change:presentList"); // workaround for pushing an element != change an array
         },
-        logStack: function(unreg) {
-            log(unreg ? '>>\tThread popped out' : '>>\tThread pushed in.');
+        logStack: function(unreg, cls) {
+            log('>>\tThread ' + cls + (unreg ? ' popped out' : ' pushed in.'));
             log('>>\tThread Stack:');
             _(this.get('threadStack')).each( function(o) {
                 log('\t\t' + o.view + '\t' + o.name + '\t' + o.cls, DEBUG);
@@ -342,6 +405,7 @@ $(function() {
             $("#sidebar-wrapper").hide();
         }
     });
+
     var settingsController = new SettingsController();
     var sessionController = new SessionController();
 
@@ -354,7 +418,7 @@ $(function() {
     //warn('$ mun.js successfully initialized.', 'success');
 
     initView.initializeSession();
-    controlView.launchRollCall();
+    // controlView.openGSL();
 });
 
 

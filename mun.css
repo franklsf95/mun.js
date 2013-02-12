@@ -134,23 +134,52 @@
   background-color: #ebf5ff;
 }
 
-.roll-call-view .roll-call-current {
+.roll-call-view button {
+  width: 100px;
+}
+
+/*----------------------------
+   Speakers List View
+ -----------------------------*/
+ .gsl-view {
+   overflow: auto;
+ }
+
+.highlight-country {
   font-size: 80px;
   line-height: 88px;
   color: #000;
   margin-bottom: 10px;
 }
 
-.roll-call-view button {
-  width: 100px;
-}
-
-.roll-call-view ul {
+.pending-country-list {
   margin-top: 20px;
 }
 
-.roll-call-view li {
+.pending-country-list > li {
   list-style: none;
   font-size: 28px;
   line-height: 32px;
 }
+
+#sl-add-country {
+  width: 120px;
+}
+
+#btn-gsl-next {
+  margin: 0 0 10px 10px;
+}
+
+.badge-add {
+  display: inline-block;
+  padding: 0 9px;
+  margin-left: 6px;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #0f82f5;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  border-radius: 9px;
+}
+
+

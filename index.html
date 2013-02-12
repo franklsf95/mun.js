@@ -67,7 +67,7 @@
         <div class="span6 wrapper" id="main-wrapper">
           <div class="wrapper-name">Ongoing: <span id="main-activity-name">Moderated Caucus</span></div>
           <div id="main-activity">
-            <p>idle</p>
+            You shouldn't see this.
           </div>
 
         </div> <!-- /main-wrapper -->
@@ -215,8 +215,22 @@ USA</textarea>
 
     </script>
 
-    <script type="text/template" id="template-alert">
-      
+    <script type="text/template" id="tpl-init-sl">
+<div class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3>Speaker''s List Initialization</h3>
+  </div>
+  <div class="modal-body">
+    <label for="init-country-list">Country List</label>
+    <textarea id="init-country-list" class="span4" rows="10"></textarea>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+    <a href="#" class="btn btn-info" id="submit-init">Initialize Session</a>
+  </div>
+
+</div> <!-- /modal -->
     </script>
   </body>
 </html>
