@@ -78,7 +78,7 @@
             <div class="timer" id="global-timer"></div>
             <div id="global-timer-append">
               <div>Total Time: <span id="global-total-time">9:25</span></div>
-              <button class="btn btn-inverse" id="btn-timer-toggle">Continue</button>
+              <button class="btn btn-info" id="btn-timer-toggle">Continue</button>
               <button class="btn btn-danger" id="btn-timer-reset">Reset</button>
             </div>
           </div><!-- /timer-wrapper -->
@@ -90,15 +90,16 @@
             </dl>
           </div><!-- /stats-wrapper -->
           
-          <a download="somedata.csv" href="data:application/csv;charset=utf-8,Col1%2CCol2%2CCol3%0AVal1%2CVal2%2CVal3%0AVal11%2CVal22%2CVal33%0AVal111%2CVal222%2CVal333">Example Download File</a>
+          <a download="somedata.csv" href="data:application/csv;charset=utf-8,Col1%2CCol2%2CCol3%0AVal1%2CVal2%2CVal3%0AVal11%2CVal22%2CVal33%0AVal111%2CVal222%2CVal333">Test CSV Download File</a>
 
         </div> <!-- /sidebar-wrapper -->
       </div> <!-- /row -->
 
       <div class="wrapper" id="control-wrapper">
         <div class="wrapper-name">Main Controls</div>
-        <button class="btn btn-info btn-large" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize</button>
-        <button class="btn btn-primary btn-large" id="btn-roll-call" disabled>Roll Call</button>
+        <button class="btn" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize</button>
+        <button class="btn" id="btn-roll-call" disabled>Roll Call</button>
+        <button class="btn" id="btn-gsl">General Speaker's List</button>
         <hr>
 
         <button class="btn btn-primary" id="btn-toggle-fullscreen">Fullscreen Mode</button>

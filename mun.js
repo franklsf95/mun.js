@@ -1,6 +1,24 @@
 $(function() {
     var DEBUG = 0, PRODUCT = 1;
 
+    var SpeakersList = Backbone.Model.extend({
+        defaults: {
+            'list': [],
+            'current': 0
+        },
+        initialize: function() {
+            log('\tSpeakersList created.', DEBUG);
+        }
+    });
+
+    var GSLView = Backbone.View.extend({
+        el: $("#main-activity"),
+        initialize: function() {
+            var gsl = new SpeakersList();
+            sessionController.register("General Speaker's List", 'gsl-view');
+        }
+    });
+
     var RollCallView = Backbone.View.extend({
         el: $("#main-activity"),
         events: {
@@ -11,11 +29,9 @@ $(function() {
         countryList: [],
         initialize: function() {
             this.countryList = sessionController.get('countryList');
-
-            sessionController.set('ongoing', 'Roll Call');
-            Backbone.$("#main-wrapper").addClass("roll-call-view");
+            sessionController.register('Roll Call', 'roll-call-view');
             this.render();
-            log('Roll Call View initialized.', DEBUG);
+            log('RollCallView initialized.', DEBUG);
         },
         render: function() {
             var content;
@@ -55,6 +71,7 @@ $(function() {
             sessionController.set('ongoing', 'idle');
             this.$el.html('');
             notice('Roll Call completed.', 'success');
+            log('RollCallView terminated.', DEBUG);
         }
     });
 
@@ -70,6 +87,7 @@ $(function() {
             this.$etimer.timer({
                 time: 8
             });
+            log('TimerView initialized.', DEBUG);
         },
         toggle: function() {
             if (this.running) {
@@ -91,11 +109,12 @@ $(function() {
     var ControlView = Backbone.View.extend({
         el: $("#control-wrapper"),
         initialize: function() {
-
+            log('ControlView initialized.', DEBUG);
         },
         events: {
             "click #btn-toggle-fullscreen": "toggleFullscreen",
-            'click #btn-roll-call': "launchRollCall",
+            "click #btn-roll-call": "launchRollCall",
+            "click #btn-gsl": "openGSL",
             "change #input-xml-log": "readXMLFile"
         },
         toggleFullscreen: function() {
@@ -110,6 +129,9 @@ $(function() {
         },
         launchRollCall: function() {
             var rollCallView = new RollCallView();
+        },
+        openGSL: function() {
+            var gslView = new GSLView();
         },
         readXMLFile: function(e) {
             var file = e.target.files[0];
@@ -128,6 +150,7 @@ $(function() {
         initialize: function() {
             this.initializeGlobal();
             this.on("change", this.initializeGlobal);
+            log('\tSettingsController created.', DEBUG);
         },
         defaults: {
             'globalPrompt': 'This is a development version of mun.js'
@@ -145,10 +168,18 @@ $(function() {
             'presentList': [],
             'sessionStats': {},
             'sessionInfo': {},
-            'ongoing': 'idle'
+            'ongoing': 'idle',
+            'ongoingClass': '',
+            'threadStack': []
         },
         initialize: function() {
             this.on("change:presentList", this.calculate);
+            log('\tSessionController created.', DEBUG);
+        },
+        register: function(name, cls) {
+            this.get('threadStack').push( new Array(this.get('ongoing'), this.get('ongoingClass')) );
+            log(this.get('threadStack'), DEBUG);
+            this.set({'ongoing': name, 'ongoingClass': cls});
         },
         calculate: function() {
             var present = this.get('presentList').length;
@@ -169,6 +200,7 @@ $(function() {
         el: $("#list-session-stats"),
         initialize: function(){
             this.listenTo(sessionController, "change:sessionStats", this.render);
+            log('StatsView initialized.', DEBUG);
         },
         render: function(){
             this.$el.html("");
@@ -183,6 +215,9 @@ $(function() {
 
     var SettingsModelView = Backbone.View.extend({
         el: $("#modal-settings"),
+        initialize: function() {
+            log('SettingsModelView initialized.', DEBUG);
+        },
         events: {
             "click #submit-global-settings": "saveGlobalSettings"
         },
@@ -197,6 +232,7 @@ $(function() {
             "click #submit-init": "initializeSession"
         },
         initialize: function(){
+            log('InitModelView initialized.', DEBUG);
             //this.listenTo(sessionController, "change:sessionInfo change:countryList", this.render);
         },
         render: function(){
@@ -220,16 +256,19 @@ $(function() {
 
     var AppView = Backbone.View.extend({
         initialize: function() {
-            this.listenTo(sessionController, "change:ongoing", this.render);
+            this.listenTo(sessionController, "change:ongoing change:ongoingClass", this.render);
             this.listenTo(sessionController, "change:sessionInfo", this.renderTitle);
             this.render();
             //initialize XML FileReader
+            log('AppView initialized.', DEBUG);
             if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
                 warn('XML File Processing Function not available.');
             }
         },
         render: function() {
             $("#main-activity-name").html(sessionController.get("ongoing"));
+            $("#main-wrapper").addClass(sessionController.get("ongoingClass"));
+            //log(sessionController.get("threadStack"), DEBUG);
         },
         renderTitle: function() {
             $("#title-committee").html(sessionController.get('sessionInfo')['committee']);
