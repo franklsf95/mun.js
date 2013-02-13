@@ -4,7 +4,7 @@ $(function() {
     var SpeakersList = Backbone.Model.extend({
         defaults: {
             'list': [],
-            'current': 0,
+            'current': -1,
             'time': 120
         },
         initialize: function(arr) {
@@ -33,7 +33,6 @@ $(function() {
             "click #btn-gsl-next": "nextCountry"
         },
         initialize: function() {
-            this.model.push('China').push('USA');
             this.listenTo(this.model, 'change:list', this.renderList);
             this.listenTo(this.model, 'change:time', this.renderTimer);
             sessionController.register(this, "General Speaker's List", 'gsl-view');
@@ -42,13 +41,17 @@ $(function() {
             // $theModal.appendTo($("body")).attr("id", "modal-ha");
         },
         render: function() {
-            var content = '<div class="highlight-country">' + this.model.get('list')[this.model.get('current')] + '</div>';
+            var country = this.model.get('list')[this.model.get('current')];
+            if (country === undefined) {
+                country = '';
+            }
+            var content = '<div class="highlight-country">' + country + '</div>';
             content += '<hr>';
             content += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="Enter to Add Country"><button id="btn-gsl-next" class="btn btn-primary">Next Speaker</button>';
             this.$el.html(content);
-            $("#sl-add-country").tooltip({'trigger': 'focus'});
             this.renderList();
             this.renderTimer();
+            $("#sl-add-country").tooltip({'trigger': 'focus'}).focus();
             return this;
         },
         renderList: function() {
@@ -79,6 +82,7 @@ $(function() {
             } else {
                 $(".highlight-country").html(c);
                 this.renderList();
+                timerView.reset();
                 return this;
             }
         },
@@ -163,10 +167,12 @@ $(function() {
             "click #btn-timer-reset": "reset"
         },
         initialize: function() {
-            this.$etimer.timer({
-                time: 8
-            });
+            this.$etimer.timer();
+            this.setStart();
             log('$ TimerView initialized.', DEBUG);
+        },
+        setStart: function() {
+            $("#btn-timer-toggle").html("Start");
         },
         setTime: function(t) {
             this.$etimer.timer({time: t});
@@ -183,7 +189,9 @@ $(function() {
             }
         },
         reset: function() {
+            if (this.running) this.toggle();
             this.$etimer.timer('reset');
+            this.setStart();
             log('Timer reset', DEBUG);
         }
     });

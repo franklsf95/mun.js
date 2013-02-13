@@ -56,7 +56,7 @@
 
     $.fn.timer = function(method) {
         var options = $.extend( {
-            'time': 600,
+            'time': 0,
             'timings': {
                 5: 'timer-warning'
             }
