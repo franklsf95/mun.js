@@ -100,6 +100,13 @@
         <button class="btn" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize</button>
         <button class="btn" id="btn-roll-call" disabled>Roll Call</button>
         <button class="btn" id="btn-gsl">General Speaker's List</button>
+        <div class="btn-group">
+          <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Motion <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li><a href="#" id="btn-motion-gsl-time">Change General Speech Time</a></li>
+          </ul>
+        </div>
+
         <hr>
 
         <button class="btn btn-primary" id="btn-toggle-fullscreen">Fullscreen Mode</button>
@@ -207,12 +214,12 @@ USA</textarea>
     <script src="js/backbone.js"></script>
 
     <script src="js/bootstrap.js"></script>
+    <script src="js/bootbox.js"></script>
     <script src="js/screenfull.js"></script>
     <script src="js/jquery.timer.js"></script>
 
     <script src="mun.js"></script>
     <script>
-
     </script>
 
     <script type="text/template" id="tpl-init-sl">

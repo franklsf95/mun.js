@@ -37,8 +37,7 @@ $(function() {
             this.listenTo(this.model, 'change:time', this.renderTimer);
             sessionController.register(this, "General Speaker's List", 'gsl-view');
 
-            // $theModal = $( $("#tpl-init-sl").html().replace('\n', '') );
-            // $theModal.appendTo($("body")).attr("id", "modal-ha");
+            
         },
         render: function() {
             var country = this.model.get('list')[this.model.get('current')];
@@ -205,6 +204,7 @@ $(function() {
             "click #btn-toggle-fullscreen": "toggleFullscreen",
             "click #btn-roll-call": "launchRollCall",
             "click #btn-gsl": "openGSL",
+            "click #btn-motion-gsl-time": "motionGSLTime",
             "change #input-xml-log": "readXMLFile"
         },
         toggleFullscreen: function() {
@@ -218,11 +218,23 @@ $(function() {
             }
         },
         launchRollCall: function() {
-            var rollCallView = new RollCallView();
+            this.rollCallView = new RollCallView();
         },
         openGSL: function() {
-            var gsl = new SpeakersList();
-            var gslView = new GSLView({model: gsl});
+            this.gsl = new SpeakersList();
+            this.gslView = new GSLView({model: this.gsl});
+        },
+        motionGSLTime: function() {
+            //motion gatekeeper
+            if (this.gsl === undefined) {
+                notice("General Speaker's List must first be initialized!");
+                return;
+            }
+            var _gsl = this.gsl;
+            bootbox.prompt("Enter new speaking time:", function(t) {
+                _gsl.set('time', t);
+                notice("General Speech's Time is changed to " + t + " seconds.", 'success');
+            });
         },
         readXMLFile: function(e) {
             var file = e.target.files[0];
@@ -452,4 +464,14 @@ function notice(s, type) {
     if (!type) con += '<strong>Warning! </strong>';
     con += s + '</div>';
     $(con).prependTo($("#main-wrapper")).hide().fadeIn();
+}
+
+function now() {
+    var t = new Date();
+    return t.getHours() + ':' + t.getMinutes();
+}
+
+function newModal() {
+    $theModal = $( $("#tpl-init-sl").html().replace('\n', '') );
+    $theModal.appendTo($("body")).attr("id", "modal-ha").modal('show');
 }
