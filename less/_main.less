@@ -36,10 +36,30 @@
 }
 
 /*----------------------------
+   Bootbox
+ -----------------------------*/
+.bootbox {
+  .motion-title {
+    display: block;
+    font-size: @baseFontSize * 1.5;
+    line-height: @baseLineHeight * 1.5;
+    font-weight: bold;
+  }
+  .huge-number {
+    font-size: @baseFontSize * 5;
+    line-height: @baseFontSize * 5 + 20px;
+  }
+  .btn {
+    font-weight: bold;
+    padding: 5px 20px;
+  }
+}
+
+/*----------------------------
    Session Title
  -----------------------------*/
 #session-title {
-  font-size: 24px;
+  font-size: @baseFontSize * 1.75;
   padding: 18px 0 8px 0;
 }
 
@@ -96,15 +116,18 @@
  -----------------------------*/
 #stats-wrapper {
   height: 200px;
+}
+
+#dl-session-stats {
   > dt {
-    line-height: 32px;
+    line-height: @baseLineHeight * 1.6;
     width: 140px;
   }
   > dd {
-    font-size: 28px;
+    font-size: @baseFontSize * 2;
     font-family: @monoFontFamily;
-    line-height: 32px;
-    margin-left: 156px;
+    line-height: @baseLineHeight * 1.6;
+    margin-left: @baseFontSize * 11;
   }
 }
 /*----------------------------

@@ -2,7 +2,7 @@ DEBUG     = 0
 PRODUCT   = 1
 THRESHOLD = DEBUG
 
-log = (s, lv) -> console.log s if lv >= THRESHOLD
+log = (s, lv) -> console.log s #if lv >= THRESHOLD
 
 warn = (s, type) ->
   con = "<div class=\"alert"
@@ -16,9 +16,13 @@ notice = (s, type) ->
   con = "<div class=\"alert"
   con += " alert-" + type  if type
   con += "\">" + "<button class=\"close\" data-dismiss=\"alert\">&times;</button>"
-  con += "<strong>Warning! </strong>"  unless type
+  con += "<b>Warning: </b>"  unless type
   con += s + "</div>"
   $(con).prependTo($ "#main-wrapper").hide().fadeIn()
+
+error   = (s) -> notice '<b>Error: </b>'   + s, 'error'
+success = (s) -> notice '<b>Success: </b>' + s, 'success'
+info    = (s) -> notice '<b>Notice: </b>'  + s, 'info'
 
 now = ->
   t = new Date
@@ -107,6 +111,45 @@ jQuery ->
       notice "General Speaker's List exhausted.", 'info'
       log 'GSLView terminated.', DEBUG
 
+  class RollCallView extends Backbone.View
+    el: $ "#main-activity"
+    events:
+      "click #btn-roll-call-present": "countryPresent"
+      "click #btn-roll-call-absent":  "countryAbsent"
+    current: 0
+    countryList: [],
+    className: 'roll-call-view'
+    initialize: ->
+      @countryList = Master.get 'countryList'
+      Master.register @, 'Roll Call', @className
+      log '$ RollCallView initialized.', DEBUG
+    render: ->
+      if @current == @countryList.length
+        @terminate()
+      else
+        content = '<div class="highlight-country">' + this.countryList[this.current] + '</div>'
+        content += '<button class="btn btn-success" id="btn-roll-call-present">Present (P)</button>'
+        content += '<button class="btn btn-warning" id="btn-roll-call-absent">Absent (A)</button>'
+        content += '<ul class="pending-country-list">'
+        content += "<li>#{c}</li>"  for c in @countryList[@current + 1 .. @current + 5]
+        content += '<li>...</li>'  if @current + 5 < @countryList.length
+        content += '</li>'
+      @$el.html content
+      @
+    countryPresent: ->
+      log @countryList[@current] + ' is present.', PRODUCT
+      Master.addPresentCountry @countryList[@current]
+      @current++
+      @render()
+    countryAbsent: ->
+      log @countryList[@current] + ' is absent.', PRODUCT
+      @current++
+      @render()
+    terminate: ->
+      Master.unregister @className
+      success 'Roll Call completed.'
+      log 'RollCallView terminated', DEBUG
+
   class SettingsModalView extends Backbone.View
     el: $ "#modal-settings"
     events:
@@ -191,17 +234,48 @@ jQuery ->
       @gslView = new SLView(model: @gsl)
 
     motionMC: ->
-      @mcsl = new SpeakersList()
-      @mcView = new SLView(model: @mcsl)
+      @motionVote 'Motion for Moderated Caucus', 'm1', ->
+        @mcsl = new SpeakersList()
+        @mcView = new SLView(model: @mcsl)
 
     motionGSLTime: ->
       if not @gsl?
-        notice "General Speaker's List must first be initialized!"
+        error "General Speaker's List must first be initialized!"
         return
+
       _gsl = @gsl
-      bootbox.prompt "Enter new Speaking Time:", (t) ->
-        _gsl.set 'time': t
-        notice "General Speech's Time is changed to #{t} seconds.", 'success'
+      @motionVote "Motion to Change General Speaking Time", 'm1', ->
+        bootbox.prompt "Enter new Speaking Time:", (t) ->
+          _gsl.set 'time': t
+          success "General Speech's Time is changed to #{t} seconds."
+
+    motionVote: (title, pass, callback) ->
+      if not Master.get('sessionStats').cnt?
+        error "Session Statistics must first be initialized!"
+        info "The #{title} fails."
+        return false
+
+      if pass == 'm2'
+        pass = Master.get('sessionStats').m2.value
+      else if pass == 'm1'
+        pass = Master.get('sessionStats').m1.value
+      #else case number
+      else
+        pass = Master.get('sessionStats').m1.value
+
+      bootbox.dialog "<span class=\"motion-title\">#{title}</span>This motion needs <code class=\"huge-number\">#{pass}</code> votes in favor to pass.",
+        [
+            'label'   : 'Fail'
+            'class'   : 'btn-warning'
+            'callback': ->
+              info "The #{title} fails."
+          ,
+            'label'   : 'Pass'
+            'class'   : 'btn-success'
+            'callback': ->
+              success "The #{title} passes."
+              callback()
+        ]
 
     readXML: (e) ->
       file = e.target.files[0]
@@ -213,14 +287,15 @@ jQuery ->
       reader.readAsText file, 'UTF-8'
 
   class StatsView extends Backbone.View
-    el: $ "#list-session-stats"
+    el: $ "#dl-session-stats"
     initialize: ->
       @listenTo Master, 'change:sessionStats', @render
       log '$ StatsView initialized.', DEBUG
     render: ->
       @$el.html ''
-      for key, value of Master.get 'sessionStats'
-        @$el.append "<dt>#{key}</dt><dd>#{value}</dd>"
+      arr = Master.get 'sessionStats'
+      for i of arr
+        @$el.append "<dt>#{arr[i].key}</dt><dd>#{arr[i].value}</dd>"
       @
 
   class IdleView extends Backbone.View
@@ -228,14 +303,14 @@ jQuery ->
     initialize: ->
       @render()
     render: ->
-      @$el.html '<p>idle</p>'
+      @$el.html '<p>There is currently no active activities.</p>'
       log 'IdleView rendered', DEBUG
 
   class MasterControl extends Backbone.Model
     defaults:
       countryList: []
       presentList: []
-      sessionStats: {}
+      sessionStats: []
       sessionInfo: {}
       ongoing:
         view: new IdleView()
@@ -277,10 +352,18 @@ jQuery ->
     calculate: ->
       p = @get('presentList').length
       @set 'sessionStats',
-        'Country Present': p
-        'Simple Majority': Math.floor(p / 2) + 1
-        'Absolute Majority': Math.floor(p * 2 / 3) + 1
-        '20% Present Count': Math.round(p / 5)
+        cnt:
+          key: 'Country Present'
+          value: p
+        m1:
+          key: 'Simple Majority'
+          value: Math.floor(p / 2) + 1
+        m2:
+          key: 'Absolute Majority'
+          value: Math.floor(p * 2 / 3) + 1
+        spm:
+          key: 'Sponsors Minimum'
+          value: Math.round(p / 5)
 
     addPresentCountry: (c) ->
       @get('presentList').push c
@@ -311,7 +394,7 @@ jQuery ->
       $("#main-wrapper").addClass Master.get('ongoing').cls
 
     unrender: (cls) ->
-      $("main-wrapper").removeClass cls
+      $("#main-wrapper").removeClass cls
 
     renderTitle: ->
       $("#title-committee").html  Master.get('sessionInfo')['committee']
