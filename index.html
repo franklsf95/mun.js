@@ -98,9 +98,9 @@
         <div class="wrapper-name">Main Controls</div>
         <button class="btn" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize</button>
         <button class="btn" id="btn-roll-call" disabled>Roll Call</button>
-        <button class="btn" id="btn-gsl">General Speaker's List</button>
+        <button class="btn" id="btn-gsl" disabled>General Speaker's List</button>
         <div class="btn-group dropup">
-          <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Motion <span class="caret"></span></button>
+          <button class="btn btn-primary dropdown-toggle" id="btn-motion" data-toggle="dropdown" disabled>Motion <span class="caret"></span></button>
           <ul class="dropdown-menu">
             <li><a href="#" id="btn-motion-mc">Moderated Caucus</a></li>
             <li><a href="#" id="btn-motion-umc">Un-moderated Caucus</a></li>
@@ -124,22 +124,30 @@
       </div>
       <div class="modal-body">
           <ul id="modal-settings-tabs" class="nav nav-tabs">
-            <li class="active"><a href="#modal-settings-general" data-toggle="tab">General</a></li>
-            <li><a href="#modal-settings-profile" data-toggle="tab">Profile</a></li>
+            <li class="active"><a href="#modal-settings-general" data-toggle="tab">Conference</a></li>
+            <li><a href="#modal-settings-profile" data-toggle="tab">Interface</a></li>
           </ul>
           <div id="modal-settings-content" class="tab-content">
-            <div class="tab-pane fade in active" id="modal-settings-modal-settings-general">
+            <div class="tab-pane active" id="modal-settings-general">
               <form class="form-horizontal">
                 <div class="control-group">
-                  <label for="input-global-prompt" class="control-label">Global Prompt</label>
+                  <label for="input-globalPrompt" class="control-label">Global Prompt</label>
                   <div class="controls">
-                    <input type="text" id="input-global-prompt" class="span4">
+                    <input type="text" id="input-globalPrompt" class="span4">
                   </div>
                 </div>
               </form>
             </div>
-            <div class="tab-pane fade" id="modal-settings-profile">
-              <p>Hello</p>
+            <div class="tab-pane" id="modal-settings-profile">
+              <form class="form-horizontal">
+                <div class="control-group">
+                  <label for="input-autoFadeTime" class="control-label">Alert Auto-Fade Time</label>
+                  <div class="controls input-append">
+                    <input type="text" id="input-autoFadeTime" class="span2">
+                    <span class="add-on">ms</span>
+                  </div>
+                </div>
+              </form>
             </div>
           </div><!-- /tab-content -->
       </div>
