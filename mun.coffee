@@ -332,6 +332,17 @@ jQuery ->
       @$el.html '<p>There is currently no active activity.</p>'
       log 'IdleView rendered', DEBUG
 
+  class Item extends Backbone.Model
+    initialize: ->
+      log '@ Item created.', DEBUG
+  class ItemSL extends Item
+  class Timeline extends Backbone.Collection
+    model: Item
+    initialize: ->
+      log '% Timeline (Item collection) created.', DEBUG
+  class TimelineView extends Backbone.View
+    el: $ "#timeline-wrapper"
+
   class MasterControl extends Backbone.Model
     defaults:
       countryList: []
