@@ -34,6 +34,7 @@ jQuery ->
   newModal = ->
     $theModal = $($("#tpl-init-sl").html().replace("\n", ""))
     $theModal.appendTo($("body")).attr("id", "modal-ha").modal "show"
+
   class SpeakersList extends Backbone.Model
     defaults:
       list: []
@@ -173,7 +174,9 @@ jQuery ->
       log '> SettingsModalView refreshed.'
       @
     saveGlobalSettings: ->
-      vars.key = $("#input-" + key).val() for key of Master.get 'variables'
+      vars = {}
+      for key of Master.get 'variables'
+        vars[key] = $("#input-" + key).val()
       Master.set 'variables', vars
 
   class InitModalView extends Backbone.View
@@ -194,6 +197,7 @@ jQuery ->
         'countryList':
           clist
       appView.enable 'btn-roll-call'
+      log 'Session successfully initialized!', PRODUCT
 
   class TimerView extends Backbone.View
     $et: $ "#global-timer"
@@ -231,6 +235,7 @@ jQuery ->
       log '$ ControlView initialized.', DEBUG
     events:
       "click #btn-toggle-fullscreen": "toggleFullscreen"
+      "click #btn-pause"            : "togglePause"
       "click #btn-roll-call"        : "initRollCall"
       "click #btn-gsl"              : "initGeneralSL"
       "click #btn-motion-gsl-time"  : "motionGSLTime"
@@ -240,6 +245,20 @@ jQuery ->
       if screenfull.enabled
         screenfull.toggle()
         $("#btn-toggle-fullscreen").html (if screenfull.isFullscreen then 'Exit Fullscreen' else 'Fullscreen Mode')
+    togglePause: ->
+      if Master.get 'paused'
+        log 'Session resumed.', PRODUCT
+        return false
+      else
+        log 'Session paused.', PRODUCT
+        bootbox.dialog "<span class=\"suspend-title\">This session is temporarily suspended.</span><hr>",
+          [
+            'label'   : 'Resume Session'
+            'class'   : ''
+            'callback': ->
+              @togglePause
+          ]
+
     initRollCall: ->
       @rollCallView = new RollCallView()
     initGeneralSL: ->
@@ -327,6 +346,7 @@ jQuery ->
       variables:
         globalPrompt: 'This is a development version of mun.js'
         autoFadeTime: 3000
+      paused: false
     initialize: ->
       @on 'change:presentList', @calculate
       log '@ Object MasterControl created.', DEBUG
