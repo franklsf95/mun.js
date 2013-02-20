@@ -69,11 +69,11 @@ jQuery ->
     render: ->
       country = @model.get('list')[@model.get 'current']
       country ?= ''
-      content = "<div class=\"highlight-country\">#{country}</div>"
-      content += '<hr>'
-      content += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="Enter to Add Country">'
-      content += '<button id="btn-gsl-next" class="btn btn-primary">Next Speaker</button>'
-      @$el.html content
+      h = "<div class=\"highlight-country\">#{country}</div>"
+      h += '<hr>'
+      h += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="Enter to Add Country">'
+      h += '<button id="btn-gsl-next" class="btn btn-primary">Next Speaker</button>'
+      @$el.html h
       @renderList()
       @renderTimer()
       $("#sl-add-country").tooltip(trigger: 'focus').focus()
@@ -81,10 +81,10 @@ jQuery ->
     renderList: ->
       $(".pending-country-list").remove()
       list = @model.get 'list'
-      content = '<ul class="pending-country-list">'
-      content += "<li>#{c}</li>"  for c in list[@model.get('current') + 1 ..]
-      content += "</ul>"
-      @$el.append content
+      h = '<ul class="pending-country-list">'
+      h += "<li>#{c}</li>"  for c in list[@model.get('current') + 1 ..]
+      h += "</ul>"
+      @$el.append h
       @
     renderTimer: ->
       timerView.setTime @model.get 'time'
@@ -105,7 +105,7 @@ jQuery ->
     terminate: ->
       Master.unregister 'gsl-view'
       @undelegateEvents()
-      notice @name + " exhausted.", 'info'
+      info @name + " exhausted."
       log @name + ' terminated.', DEBUG
 
   class GSLView extends BaseSLView
@@ -117,6 +117,24 @@ jQuery ->
     initialize: ->
       super("Moderacted Caucus", 'mc-view')
       log '\t$ MCView initialized.', DEBUG
+
+  class UMCView extends Backbone.View
+    el: $ "#main-activity"
+    events: 
+      "click #btn-exit-umc": "terminate"
+    initialize: (ops) ->
+      Master.register @, "Un-moderated Caucus", 'umc-view'
+      timerView.setTime ops.time
+      @render()
+      log '\t$ UMCView initialized.', DEBUG
+    render: ->
+      h =  '<div>Un-moderated Caucus</div>'
+      h += '<button class="btn btn-warning" id="btn-exit-umc">Close UMC (Ctrl+C)</button>'
+      @$el.html h
+    terminate: ->
+      Master.unregister 'umc-view'
+      @undelegateEvents()
+      info "This Un-moderated Caucus has expired."
 
   class RollCallView extends Backbone.View
     el: $ "#main-activity"
@@ -135,14 +153,14 @@ jQuery ->
       if @current == @countryList.length
         @terminate()
       else
-        content = '<div class="highlight-country">' + this.countryList[this.current] + '</div>'
-        content += '<button class="btn btn-success" id="btn-roll-call-present">Present (P)</button>'
-        content += '<button class="btn btn-warning" id="btn-roll-call-absent">Absent (A)</button>'
-        content += '<ul class="pending-country-list">'
-        content += "<li>#{c}</li>" for c in @countryList[@current + 1 .. @current + 5]
-        content += '<li>...</li>'  if @current + 5 < @countryList.length
-        content += '</li>'
-      @$el.html content
+        h =  '<div class="highlight-country">' + this.countryList[this.current] + '</div>'
+        h += '<button class="btn btn-success" id="btn-roll-call-present">Present (P)</button>'
+        h += '<button class="btn btn-warning" id="btn-roll-call-absent">Absent (A)</button>'
+        h += '<ul class="pending-country-list">'
+        h += "<li>#{c}</li>" for c in @countryList[@current + 1 .. @current + 5]
+        h += '<li>...</li>'  if @current + 5 < @countryList.length
+        h += '</li>'
+      @$el.html h
       @
     countryPresent: ->
       log @countryList[@current] + ' is present.', PRODUCT
@@ -198,6 +216,7 @@ jQuery ->
           clist
       appView.enable 'btn-roll-call'
       log 'Session successfully initialized!', PRODUCT
+      @$el.modal 'hide'
 
   class TimerView extends Backbone.View
     $et: $ "#global-timer"
@@ -240,6 +259,7 @@ jQuery ->
       "click #btn-gsl"              : "initGeneralSL"
       "click #btn-motion-gsl-time"  : "motionGSLTime"
       "click #btn-motion-mc"        : "motionMC"
+      "click #btn-motion-umc"       : "motionUMC"
       "change #input-xml-log"       : "readXML"
     toggleFullscreen: ->
       if screenfull.enabled
@@ -258,7 +278,6 @@ jQuery ->
             'callback': ->
               @togglePause
           ]
-
     initRollCall: ->
       @rollCallView = new RollCallView()
     initGeneralSL: ->
@@ -267,7 +286,11 @@ jQuery ->
     motionMC: ->
       @motionVote 'Motion for Moderated Caucus', 'm1', ->
         @mcsl = new SpeakersList()
-        @mcView = new GSLView(model: @mcsl)
+        @mcView = new MCView(model: @mcsl)
+    motionUMC: ->
+      @motionVote 'Motion for Un-moderated Caucus', 'm1', ->
+        bootbox.prompt "Enter UMC Time:", (t) ->
+          @umcView = new UMCView(time: t)
     motionGSLTime: ->
       if not @gsl?
         error "General Speaker's List must first be initialized!"
