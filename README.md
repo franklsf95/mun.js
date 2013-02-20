@@ -3,6 +3,9 @@ mun.js
 
 A Presentation Tool for Model UN Conferences, created based on HTML5 + CSS3 + JavaScript
 
+# License
+This project is released under the [MIT License](http://mit-license.org/).
+
 # Usage
 The project is currently under development and not recommended for production use. You need to manually compile the .less and .coffee into .css and .js respectively.
 
