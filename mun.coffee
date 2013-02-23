@@ -91,17 +91,20 @@ jQuery ->
       Master.register @, @name, @cls
       log '$ BaseSLView initialized.', DEBUG
     render: ->
-      log @model
+      @$el.html ''
+      @renderCurrent()
+      @renderList()
+      @renderTimer()
+      $("#sl-add-country").tooltip(trigger: 'focus').focus()
+      @
+    renderCurrent: ->
       country = @model.get('list')[@model.get 'current']
       country ?= '(no speaker)'
       h = "<div class=\"highlight-country\">#{country}</div>"
       h += '<hr>'
       h += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="Enter to Add Country">'
       h += '<button id="btn-gsl-next" class="btn btn-primary">Next Speaker</button>'
-      @$el.html h
-      @renderList()
-      @renderTimer()
-      $("#sl-add-country").tooltip(trigger: 'focus').focus()
+      @$el.append h
       @
     renderList: ->
       $(".pending-country-list").remove()
@@ -128,7 +131,7 @@ jQuery ->
         @terminate()
       return
     terminate: ->
-      Master.unregister 'gsl-view'
+      Master.unregister @cls
       @undelegateEvents()
       info @name + " exhausted."
       log @name + ' terminated.', DEBUG
@@ -144,13 +147,12 @@ jQuery ->
       super("Moderacted Caucus", 'mc-view')
       log '\t$ MCView initialized.', DEBUG
     render: ->
-      super()
-      h  = "<div class=\"mc-title\">Topic: #{@params.topic}</div>"
-      h += '<hr>'
-      @$el.prepend h
-      h  = '<hr>'
-      h += '<button class="btn btn-info" id="btn-exit-umc">Close this Moderated Caucus</button>'
-      @$el.append h
+      @$el.html "<div class=\"mc-title\">Topic: #{@params.topic}</div><hr>"
+      @renderCurrent()
+      @renderList()
+      @renderTimer()
+      @$el.append '<hr><button class="btn btn-info" id="btn-exit-umc">Close this Moderated Caucus</button>'
+      $("#sl-add-country").tooltip(trigger: 'focus').focus()
       @
 
   class UMCView extends Backbone.View
@@ -176,10 +178,9 @@ jQuery ->
     events:
       "click #btn-roll-call-present": "countryPresent"
       "click #btn-roll-call-absent":  "countryAbsent"
-    current: 0
-    countryList: [],
     className: 'roll-call-view'
     initialize: ->
+      @current = 0
       @countryList = Master.get 'countryList'
       Master.register @, 'Roll Call', @className
       Master.set 'presentList', []
@@ -440,8 +441,11 @@ jQuery ->
       @on 'change:presentList', @calculate
       log '@ Object MasterControl created.', DEBUG
     register: (v, n, c) ->
-      @get('threadStack').push @get('ongoing')
-      appView.unrender  @get('ongoing').cls
+      old = @get('ongoing')
+      @get('threadStack').push old
+      appView.unrender old
+      old.view.undelegateEvents()
+
       @set 'ongoing',
         view: v
         name: n
@@ -452,12 +456,14 @@ jQuery ->
     unregister: (c) ->
       return @  if @get('ongoing').cls != c or c == 'idle'
       appView.unrender(c)
+      # get the last view back
       last = @get('threadStack').pop()
       @set 'ongoing',
         view: last.view
         name: last.name
         cls: last.cls
       last.view.render()
+      last.view.delegateEvents()
       @logStack true, c
       @
     calculate: ->
