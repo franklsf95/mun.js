@@ -123,8 +123,9 @@
       </div>
       <div class="modal-body">
           <ul id="modal-settings-tabs" class="nav nav-tabs">
-            <li class="active"><a href="#modal-settings-general" data-toggle="tab">Conference</a></li>
-            <li><a href="#modal-settings-profile" data-toggle="tab">Interface</a></li>
+            <li class="active"><a href="#modal-settings-general" data-toggle="tab">General</a></li>
+            <li><a href="#modal-settings-interface" data-toggle="tab">Interface</a></li>
+            <li><a href="#modal-settings-conference" data-toggle="tab">Conference</a></li>
           </ul>
           <div id="modal-settings-content" class="tab-content">
             <div class="tab-pane active" id="modal-settings-general">
@@ -136,8 +137,8 @@
                   </div>
                 </div>
               </form>
-            </div>
-            <div class="tab-pane" id="modal-settings-profile">
+            </div><!-- /tab-pane -->
+            <div class="tab-pane" id="modal-settings-interface">
               <form class="form-horizontal">
                 <div class="control-group">
                   <label for="input-autoFadeTime" class="control-label">Alert Auto-Fade Time</label>
@@ -147,7 +148,25 @@
                   </div>
                 </div>
               </form>
-            </div>
+            </div><!-- /tab-pane -->
+            <div class="tab-pane" id="modal-settings-conference">
+              <form class="form-horizontal">
+                <div class="control-group">
+                  <label for="input-mcDefaultTimeTotal" class="control-label">Default Total Time for Moderated Caucus</label>
+                  <div class="controls input-append">
+                    <input type="text" id="input-mcDefaultTimeTotal" class="span2">
+                    <span class="add-on">&nbsp;sec</span>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label for="input-mcDefaultTimeEach" class="control-label">Default Speech Time for Moderated Caucus</label>
+                  <div class="controls input-append">
+                    <input type="text" id="input-mcDefaultTimeEach" class="span2">
+                    <span class="add-on">&nbsp;sec</span>
+                  </div>
+                </div>
+              </form>
+            </div><!-- /tab-pane -->
           </div><!-- /tab-content -->
       </div>
       <div class="modal-footer">
@@ -247,6 +266,35 @@ USA</textarea>
   </div>
 
 </div> <!-- /modal -->
+    </script>
+    <script type="text/template" id="tpl-init-mc">
+<div class="motion-title">Moderated Caucus Launcher</div>
+<form class="form-horizontal">
+<div class="control-group">
+  <label for="init-mc-topic" class="control-label">Topic:</label>
+  <div class="controls">
+    <input type="text" id="init-mc-topic" class="span4">
+  </div>
+</div>
+<div class="control-group">
+  <label for="init-mc-total-time" class="control-label">Total Time:</label>
+  <div class="controls">
+    <div class="input-append">
+        <input type="text" id="init-mc-total-time">
+        <span class="add-on">&nbsp;sec</span>
+    </div>
+  </div>
+</div>
+<div class="control-group">
+  <label for="init-mc-each-time" class="control-label">Time for Each:</label>
+  <div class="controls">
+    <div class="input-append">
+        <input type="text" id="init-mc-each-time">
+        <span class="add-on">&nbsp;sec</span>
+    </div>
+  </div>
+</div>
+</form>
     </script>
   </body>
 </html>

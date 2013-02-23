@@ -1,4 +1,4 @@
-#--
+# --
 # Copyright © 2013 Frank Luan (@franklsf95)
 # https://franklsf.org
 # 
@@ -20,7 +20,7 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#++
+# ++
 
 DEBUG     = 0
 PRODUCT   = 1
@@ -60,7 +60,7 @@ jQuery ->
     $theModal.appendTo($("body")).attr("id", "modal-ha").modal "show"
 
   class SpeakersList extends Backbone.Model
-    defaults:
+    defaults: ->  # fix bug that list[] is declared static in prototype
       list: []
       current: -1
       time: 120
@@ -91,8 +91,9 @@ jQuery ->
       Master.register @, @name, @cls
       log '$ BaseSLView initialized.', DEBUG
     render: ->
+      log @model
       country = @model.get('list')[@model.get 'current']
-      country ?= ''
+      country ?= '(no speaker)'
       h = "<div class=\"highlight-country\">#{country}</div>"
       h += '<hr>'
       h += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="Enter to Add Country">'
@@ -138,9 +139,19 @@ jQuery ->
       log '\t$ GSLView initialized.', DEBUG
 
   class MCView extends BaseSLView
-    initialize: ->
+    initialize: (ops)->
+      @params = ops # topic, time_tot, time_each
       super("Moderacted Caucus", 'mc-view')
       log '\t$ MCView initialized.', DEBUG
+    render: ->
+      super()
+      h  = "<div class=\"mc-title\">Topic: #{@params.topic}</div>"
+      h += '<hr>'
+      @$el.prepend h
+      h  = '<hr>'
+      h += '<button class="btn btn-info" id="btn-exit-umc">Close this Moderated Caucus</button>'
+      @$el.append h
+      @
 
   class UMCView extends Backbone.View
     el: $ "#main-activity"
@@ -152,8 +163,8 @@ jQuery ->
       @render()
       log '\t$ UMCView initialized.', DEBUG
     render: ->
-      h =  '<div>Un-moderated Caucus</div>'
-      h += '<button class="btn btn-warning" id="btn-exit-umc">Close UMC (Ctrl+C)</button>'
+      h =  '<div class="mc-title">Un-moderated Caucus</div>'
+      h += '<button class="btn btn-info" id="btn-exit-umc">Close this Un-moderated Caucus</button>'
       @$el.html h
     terminate: ->
       Master.unregister 'umc-view'
@@ -172,6 +183,7 @@ jQuery ->
       @countryList = Master.get 'countryList'
       Master.register @, 'Roll Call', @className
       Master.set 'presentList', []
+      appView.disable 'btn-roll-call'
       log '$ RollCallView initialized.', DEBUG
     render: ->
       if @current == @countryList.length
@@ -196,6 +208,7 @@ jQuery ->
       @current++
       @render()
     terminate: ->
+      appView.enable 'btn-roll-call'
       appView.enable 'btn-gsl'
       appView.enable 'btn-motion'
       Master.unregister @className
@@ -309,11 +322,27 @@ jQuery ->
       @gslView = new GSLView(model: @gsl)
     motionMC: ->
       @motionVote 'Motion for Moderated Caucus', 'm1', ->
-        @mcsl = new SpeakersList()
-        @mcView = new MCView(model: @mcsl)
+        bootbox.dialog $("#tpl-init-mc").html(),
+          [
+              'label'   : 'Cancel'
+              'class'   : ''
+              'callback': ->
+                info "This moderated caucus is cancelled."
+            ,
+              'label'   : 'OK'
+              'class'   : 'btn-primary'
+              'callback': ->
+                log $("#init-mc-topic").val()
+                @mcView = new MCView(
+                  model: new SpeakersList,
+                  topic     : $("#init-mc-topic").val()
+                  time_tot  : $("#init-mc-total-time").val()
+                  time_each : $("#init-mc-each-time").val()
+                )
+          ]
     motionUMC: ->
       @motionVote 'Motion for Un-moderated Caucus', 'm1', ->
-        bootbox.prompt "Enter UMC Time:", (t) ->
+        bootbox.prompt "Enter UMC Time (seconds):", (t) ->
           @umcView = new UMCView(time: t)
     motionGSLTime: ->
       if not @gsl?
@@ -321,7 +350,7 @@ jQuery ->
         return
       _gsl = @gsl
       @motionVote "Motion to Change General Speaking Time", 'm1', ->
-        bootbox.prompt "Enter new Speaking Time:", (t) ->
+        bootbox.prompt "Enter new Speaking Time (seconds):", (t) ->
           _gsl.set 'time': t
           success "General Speech's Time is changed to #{t} seconds."
 
@@ -337,7 +366,7 @@ jQuery ->
       #else case number
       else
         pass = Master.get('sessionStats').m1.value
-      bootbox.dialog "<span class=\"motion-title\">#{title}</span>This motion needs <code class=\"huge-number\">#{pass}</code> votes in favor to pass.",
+      bootbox.dialog "<div class=\"motion-title\">#{title}</div>This motion needs <code class=\"huge-number\">#{pass}</code> votes in favor to pass.",
         [
             'label'   : 'Fail'
             'class'   : 'btn-warning'
@@ -404,6 +433,8 @@ jQuery ->
       variables:
         globalPrompt: 'This is a development version of mun.js'
         autoFadeTime: 3000
+        mcDefaultTimeTotal: 300 # not-used yet
+        mcDefaultTimeEach: 60   # not-used yet
       paused: false
     initialize: ->
       @on 'change:presentList', @calculate
@@ -477,6 +508,7 @@ jQuery ->
       vars = Master.get('variables')
       $("#global-prompt").html vars.globalPrompt
       log "> Global variables applied."
+
     enable: (id) ->
       $('#' + id).removeAttr 'disabled'
       log id + ' enabled', DEBUG
@@ -497,5 +529,6 @@ jQuery ->
 
   Master.trigger('change:variables')
   initModal.initSession()
+  controlView.initRollCall()
 
   return

@@ -1,4 +1,5 @@
 @import "bootswatch.less";
+// @import "bootstrap.less";
 
 /*----------------------------
    Common Style
@@ -40,7 +41,6 @@
  -----------------------------*/
 .bootbox {
   .motion-title {
-    display: block;
     font-size: @baseFontSize * 1.5;
     line-height: @baseLineHeight * 1.5;
     font-weight: bold;
@@ -60,6 +60,9 @@
     font-weight: bold;
     padding: 5px 20px;
   }
+  form {
+    margin-top: 20px;
+  }
 }
 
 /*----------------------------
@@ -74,7 +77,7 @@
    Timeline Module
  -----------------------------*/
 #timeline-wrapper {
-  background-color: #ebf5ff;
+  //background-color: #ebf5ff;
 }
 #timeline {
   padding: 0 5px;
@@ -176,13 +179,13 @@
 /*----------------------------
    Speakers List View
  -----------------------------*/
- .gsl-view {
-   overflow: auto;
- }
+.gsl-view, .mc-view, .umc-view {
+  overflow: auto;
+}
 
 .highlight-country {
-  font-size: 80px;
-  line-height: 88px;
+  font-size: 72px;
+  line-height: 80px;
   color: #000;
   margin-bottom: 10px;
 }
@@ -213,3 +216,16 @@
   background-color: #0f82f5;
   .border-radius(9px);
 }
+
+/*----------------------------
+   Motion View
+ -----------------------------*/
+.mc-title {
+  font-size: 44px;
+  line-height: 50px;
+  color: #000;
+  margin: 20px 0;
+}
+
+
+
