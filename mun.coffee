@@ -87,8 +87,7 @@ jQuery ->
       @name = n
       @cls  = c
       @listenTo @model, "change:list", @renderList
-      @listenTo @model, "change:time", @renderTimer
-      Master.register @, @name, @cls
+      Master.register @, n, c
       log '$ BaseSLView initialized.', DEBUG
     render: ->
       @$el.html ''
@@ -104,15 +103,14 @@ jQuery ->
       h += '<hr>'
       h += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="Enter to Add Country">'
       h += '<button id="btn-gsl-next" class="btn btn-primary">Next Speaker</button>'
+      h += '<ul class="pending-country-list"></ul>'
       @$el.append h
       @
     renderList: ->
-      $(".pending-country-list").remove()
       list = @model.get 'list'
-      h = '<ul class="pending-country-list">'
+      h  = ''
       h += "<li>#{c}</li>"  for c in list[@model.get('current') + 1 ..]
-      h += "</ul>"
-      @$el.append h
+      $(".pending-country-list").html h
       @
     renderTimer: ->
       timerView.setTime @model.get 'time'
@@ -133,17 +131,20 @@ jQuery ->
     terminate: ->
       Master.unregister @cls
       @undelegateEvents()
-      info @name + " exhausted."
+      info "#{@name} exhausted."
       log @name + ' terminated.', DEBUG
 
   class GSLView extends BaseSLView
     initialize: ->
       super("General Speaker's List", 'gsl-view')
+      @listenTo @model, "change:time", @renderTimer
       log '\t$ GSLView initialized.', DEBUG
 
   class MCView extends BaseSLView
+    events:
+      "click #btn-exit-umc": 'terminate'
     initialize: (ops)->
-      @params = ops # topic, time_tot, time_each
+      @params = ops  # topic, time_tot, time_each
       super("Moderacted Caucus", 'mc-view')
       log '\t$ MCView initialized.', DEBUG
     render: ->
@@ -154,6 +155,8 @@ jQuery ->
       @$el.append '<hr><button class="btn btn-info" id="btn-exit-umc">Close this Moderated Caucus</button>'
       $("#sl-add-country").tooltip(trigger: 'focus').focus()
       @
+    renderTimer: ->
+      timerView.setTime @params.time_each, @params.time_tot
 
   class UMCView extends Backbone.View
     el: $ "#main-activity"
@@ -168,10 +171,6 @@ jQuery ->
       h =  '<div class="mc-title">Un-moderated Caucus</div>'
       h += '<button class="btn btn-info" id="btn-exit-umc">Close this Un-moderated Caucus</button>'
       @$el.html h
-    terminate: ->
-      Master.unregister 'umc-view'
-      @undelegateEvents()
-      info "This Un-moderated Caucus has expired."
 
   class RollCallView extends Backbone.View
     el: $ "#main-activity"
@@ -259,14 +258,15 @@ jQuery ->
   class TimerView extends Backbone.View
     $t:  $ "#global-timer"
     $tt: $ "#global-timer-total"
+    $timers: $ ".timer"
     el:  $ "#timer-wrapper"
     running: false
     events:
       "click #btn-timer-toggle": 'toggle'
-      "click #btn-timer-reset": 'reset'
+      "click #btn-timer-reset" : 'reset'
+      "timeout"                : 'toggle'
     initialize: ->
-      @$t.timer()
-      @$tt.timer()
+      @$timers.timer()
       @setStart()
       log '$ TimerView initialized.', DEBUG
     setStart: ->
@@ -277,24 +277,23 @@ jQuery ->
       @$tt.timer time:tt
     toggle: ->
       if @running
-        log 'Stopping timer1'
-        @$t.timer 'stop'
-        log 'Stopping timer2'
-        @$tt.timer 'stop'
+        @$timers.timer 'stop'
         @running = false
         $("#btn-timer-toggle").html "Continue"
       else
-        log 'timer started.'
-        @$t.timer 'start'
-        @$tt.timer 'start'
+        @$timers.timer 'start'
         @running = true
         $("#btn-timer-toggle").html "Pause"
     reset: ->
       @toggle()  if @running
       @$t.timer 'reset'
-      @$tt.timer 'reset'
       @setStart()
-      log 'Timer reset', DEBUG
+      log 'Global Timer reset', DEBUG
+    resetAll: ->
+      @toggle()  if @running
+      @$timers.timer 'reset'
+      @setStart()
+      log 'Global Timer reset', DEBUG
 
   class ControlView extends Backbone.View
     el: $ "#control-wrapper"
@@ -546,5 +545,7 @@ jQuery ->
   Master.trigger('change:variables')
   initModal.initSession()
   controlView.initRollCall()
+
+  timerView.setTime 2, 5
 
   return

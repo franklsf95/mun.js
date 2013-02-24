@@ -6,7 +6,7 @@
                 var data = $this.data('timer');
                 if (!data) {
                     data = $.extend({}, {
-                        'time': 10,
+                        'time': 5,
                         'timings' : {
                             5: 'timer-warning'
                         }
@@ -25,8 +25,10 @@
                 var data = $this.data('timer');
                 data.thread = setInterval(function() {
                     data.now--;
-                    if (data.now === 0)
-                        methods.stop();
+                    if (data.now === 0) {
+                        methods.stop.apply($this);
+                        $this.trigger('timeout');
+                    }
                     render(data, $this);
                 }, 1000);
                 $this.data('timer', data);
@@ -44,7 +46,7 @@
                 clearInterval( data.thread );
                 data.now = data.time;
                 $this.data('timer', data);
-                render();
+                render(data, $this);
             });
         }
     };
