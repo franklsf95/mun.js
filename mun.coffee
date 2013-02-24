@@ -257,32 +257,42 @@ jQuery ->
       @$el.modal 'hide'
 
   class TimerView extends Backbone.View
-    $et: $ "#global-timer"
-    el: $ "#timer-wrapper"
+    $t:  $ "#global-timer"
+    $tt: $ "#global-timer-total"
+    el:  $ "#timer-wrapper"
     running: false
     events:
       "click #btn-timer-toggle": 'toggle'
       "click #btn-timer-reset": 'reset'
     initialize: ->
-      @$et.timer()
+      @$t.timer()
+      @$tt.timer()
       @setStart()
       log '$ TimerView initialized.', DEBUG
     setStart: ->
-      $("#btn-timer-toggle").html "Start";
-    setTime: (t) ->
-      @$et.timer time:t
+      $("#btn-timer-toggle").html "Start"
+    setTime: (t, tt) ->
+      tt ?= t
+      @$t.timer time:t
+      @$tt.timer time:tt
     toggle: ->
       if @running
-        @$et.timer 'stop'
+        log 'Stopping timer1'
+        @$t.timer 'stop'
+        log 'Stopping timer2'
+        @$tt.timer 'stop'
         @running = false
         $("#btn-timer-toggle").html "Continue"
       else
-        @$et.timer 'start'
+        log 'timer started.'
+        @$t.timer 'start'
+        @$tt.timer 'start'
         @running = true
         $("#btn-timer-toggle").html "Pause"
     reset: ->
       @toggle()  if @running
-      @$et.timer 'reset'
+      @$t.timer 'reset'
+      @$tt.timer 'reset'
       @setStart()
       log 'Timer reset', DEBUG
 
