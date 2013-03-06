@@ -1,0 +1,14 @@
+{
+    "main": {
+        "title": "模联.js"
+    },
+    "ui": {
+        "settings": "设置"
+    },
+    "prompt": {
+        "pending-init": "单击“初始化”以启动会议。"
+    },
+    "log": {
+        "init-complete": "会期初始化完成。"
+    }
+}

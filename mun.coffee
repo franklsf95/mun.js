@@ -106,7 +106,7 @@ jQuery ->
       @
     renderCurrent: ->
       country = @model.get('list')[@model.get 'current']
-      country ?= '(no speaker)'
+      country ?= '[speaker]'
       h = "<div class=\"highlight-country\">#{country}</div>"
       h += '<hr>'
       h += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="Enter to Add Country">'
@@ -428,8 +428,15 @@ jQuery ->
     model: Item
     initialize: ->
       log '% Timeline (Item collection) created.', DEBUG
+
   class TimelineView extends Backbone.View
-    el: $ "#timeline-wrapper"
+    el: $ "#timeline"
+    initialize: ->
+      @render()
+    add: (s) ->
+      @$el.html '<li><a href="#">' + now() + ' ' + s + '</a></li>\n'
+    render: ->
+      log '$ TimelineView rendered', DEBUG
 
   class MasterControl extends Backbone.Model
     defaults:
@@ -503,6 +510,7 @@ jQuery ->
 
   class AppView extends Backbone.View
     initialize: ->
+      log i18n.t 'ui.settings'
       @listenTo Master, 'change:ongoing', @render
       @listenTo Master, 'change:variables', @renderVars
       @listenTo Master, 'change:sessionInfo', @renderTitle
@@ -534,9 +542,19 @@ jQuery ->
       log id + ' disabled', DEBUG
 
 
+  i18n.init
+    ns: 'app'
+    lng: 'zh-CN'
+    debug: THRESHOLD >= DEBUG
+    getAsync: false
+    resGetPath: 'i18n/__lng__/__ns__.json'
+  .done ->
+    $('html').i18n();
+
   Master = new MasterControl()
 
   appView = new AppView()
+  timelineView = new TimelineView()
   timerView = new TimerView()
   statsView = new StatsView()
   controlView = new ControlView()
@@ -544,8 +562,10 @@ jQuery ->
   initModal = new InitModalView()
   settModal = new SettingsModalView()
 
+  timelineView.add $.t('log.init-complete')
+
   Master.trigger('change:variables')
-  initModal.initSession()
-  controlView.initRollCall()
+  # initModal.initSession()
+  # controlView.initRollCall()
 
   return

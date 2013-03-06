@@ -1,0 +1,14 @@
+{
+    "main": {
+        "title": "mun.js"
+    },
+    "ui": {
+        "settings": "Settings"
+    },
+    "prompt": {
+        "pending-init": "Click \"Initialize\" to initialize current session."
+    },
+    "log": {
+        "init-complete": "Initializaiton completed."
+    }
+}
