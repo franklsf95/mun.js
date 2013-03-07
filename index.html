@@ -26,7 +26,7 @@
             <li><a href="#" id="global-prompt"></a></li>
           </ul>
           <ul class="nav pull-right">
-            <li><a href="#" data-toggle="modal" data-target="#modal-settings" data-i18n="app:ui.settings"></a></li>
+            <li><a href="#" data-toggle="modal" data-target="#modal-settings" data-i18n="ui.settings"></a></li>
           </ul>
         </div>
       </div>
@@ -35,44 +35,36 @@
     <div class="container" id="main-container">
       <div class="row">
         <header class="span12" id="header-wrapper">
-          <div id="session-title"><span id="title-committee" data-i18n="prompt.pending-init"></span> (<span id="title-abbr"></span>): Session <span id="title-sessionid"></span></div>
+          <div id="session-title"><span id="title-committee" data-i18n="prompt.pendingInit"></span> (<span id="title-abbr"></span>): Session <span id="title-sessionid"></span></div>
         </header>
       </div>
       <div class="row-fluid">
         <div class="span3 wrapper" id="timeline-wrapper">
-          <div class="wrapper-name">Timeline</div>
-          <ul class="nav nav-list" id="timeline">
-            <li class="nav-header">Session 1</li>
-            <li><a href="#">10:00 RollCall</a></li>
-            <li><a href="#">10:10 OpenGeneralSpeakersList</a></li>
-            <li><a href="#">10:11 AddCountriesToGeneral SpeakersList</a></li>
-            <li><a href="#">10:13 SpeechGSL: Afghanistan</a></li>
-          </ul>
+          <div class="wrapper-name" data-i18n="ui.timeline"></div>
+          <ul class="nav nav-list" id="timeline"></ul>
         </div> <!-- /timeline-wrapper -->
 
         <div class="span6 wrapper" id="main-wrapper">
-          <div class="wrapper-name">Ongoing: <span id="main-activity-name">Moderated Caucus</span></div>
-          <div id="main-activity">
-            You shouldn't see this.
-          </div>
+          <div class="wrapper-name"><span data-i18n="ui.ongoing"></span><span id="main-activity-name"></span></div>
+          <div id="main-activity"></div>
 
         </div> <!-- /main-wrapper -->
 
         <div class="span3" id="sidebar-wrapper">
           <div class="wrapper" id="timer-wrapper">
-            <div class="wrapper-name">Timer</div>
+            <div class="wrapper-name" data-i18n="ui.timer"></div>
             <div class="timer" id="global-timer"></div>
             <div id="global-timer-append">
-              <div>Total Time: <span class="timer" id="global-timer-total"></span></div>
-              <button class="btn btn-info" id="btn-timer-toggle">Continue</button>
-              <button class="btn btn-danger" id="btn-timer-reset">Reset</button>
+              <div><span data-i18n="timer.totalTime"></span><span class="timer" id="global-timer-total"></span></div>
+              <button class="btn btn-info" id="btn-timer-toggle" data-i18n="btn.continue"></button>
+              <button class="btn btn-danger" id="btn-timer-reset" data-i18n="btn.reset"></button>
             </div>
           </div><!-- /timer-wrapper -->
 
           <div class="wrapper" id="stats-wrapper">
-            <div class="wrapper-name">Session Statistics</div>
+            <div class="wrapper-name" data-i18n="ui.sessionStats"></div>
             <dl class="dl-horizontal" id="dl-session-stats">
-              <p>Roll Call not started.</p>
+              <p data-i18n="prompt.rollCallNotStarted"></p>
             </dl>
           </div><!-- /stats-wrapper -->
           
@@ -82,7 +74,7 @@
       </div> <!-- /row -->
 
       <div class="wrapper" id="control-wrapper">
-        <div class="wrapper-name">Main Controls</div>
+        <div class="wrapper-name" data-i18n="ui.controls"></div>
         <button class="btn" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize</button>
         <button class="btn" id="btn-roll-call" disabled>Roll Call</button>
         <button class="btn" id="btn-gsl" disabled>General Speaker's List</button>

@@ -29,35 +29,32 @@ THRESHOLD = DEBUG
 jQuery ->
   log = (s, lv) -> console.log s #if lv >= THRESHOLD
 
-  warn = (s, type) ->
+  warn = (s, type, to) ->
+    to ?= "#main-container"
     con = "<div class=\"alert"
     con += " alert-" + type  if type
     con += "\">" + "<button class=\"close\" data-dismiss=\"alert\">&times;</button>"
-    con += "<strong>Warning! </strong>"  unless type
+    con += "<strong>#{$.t('prompt.warning')}</strong>"  unless type
     con += s + "</div>"
-    $(con).prependTo($ "#main-container").hide().slideDown()
+    $(con).prependTo($ to).hide().slideDown()
     window.setTimeout ( -> $(".alert").alert('close') ), Master.get('variables').autoFadeTime
 
-  notice = (s, type) ->
-    con = "<div class=\"alert"
-    con += " alert-" + type  if type
-    con += "\">" + "<button class=\"close\" data-dismiss=\"alert\">&times;</button>"
-    con += "<b>Warning: </b>"  unless type
-    con += s + "</div>"
-    $(con).prependTo($ "#main-wrapper").hide().fadeIn()
-    window.setTimeout ( -> $(".alert").alert('close') ), Master.get('variables').autoFadeTime
-
-  error   = (s) -> notice '<b>Error: </b>'   + s, 'error'
-  success = (s) -> notice '<b>Success: </b>' + s, 'success'
-  info    = (s) -> notice '<b>Notice: </b>'  + s, 'info'
+  notice = (s, type) -> warn s, type, "#main-wrapper"
+  error   = (s) -> notice "<b>#{$.t('prompt.error')}</b>"   + s, 'error'
+  success = (s) -> notice "<b>#{$.t('prompt.success')}</b>" + s, 'success'
+  info    = (s) -> notice "<b>#{$.t('prompt.notice')}</b>"  + s, 'info'
 
   now = ->
     t = new Date
-    t.getHours() + ":" + t.getMinutes()
+    min = t.getMinutes()
+    min = '0' + min  if min < 10
+    t.getHours() + ":" + min
 
   newModal = ->
     $theModal = $($("#tpl-init-sl").html().replace("\n", ""))
     $theModal.appendTo($("body")).attr("id", "modal-ha").modal "show"
+
+  tlog = (s) -> timelineView.add $.t "log.#{s}"
 
   class SpeakersList extends Backbone.Model
     defaults: ->  # fix bug that list[] is declared static in prototype
@@ -79,10 +76,10 @@ jQuery ->
       (@get 'list')[@get 'current']
 
   class BaseView extends Backbone.View
-    initialize: (n, c) ->
-      @name = n
+    initialize: (c) ->
+      @name = $.t "views.#{c}"
       @cls  = c
-      Master.register @, n, c
+      Master.register @, @name, @cls
       log "$ #{@name} initialized.", DEBUG
     terminate: ->
       Master.unregister @cls
@@ -94,8 +91,8 @@ jQuery ->
     events: ->   # for children to extend
       "keypress": 'enterKey'
       "click #btn-gsl-next": 'nextCountry'
-    initialize: (n, c) ->
-      super n, c
+    initialize: (c) ->
+      super c
       @listenTo @model, "change:list", @renderList
     render: ->
       @$el.html ''
@@ -106,11 +103,11 @@ jQuery ->
       @
     renderCurrent: ->
       country = @model.get('list')[@model.get 'current']
-      country ?= '[speaker]'
+      country ?= $.t 'sl.ready'
       h = "<div class=\"highlight-country\">#{country}</div>"
       h += '<hr>'
-      h += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="Enter to Add Country">'
-      h += '<button id="btn-gsl-next" class="btn btn-primary">Next Speaker</button>'
+      h += '<input type="text" id="sl-add-country" data-placement="bottom" data-original-title="' + $.t('sl.enterToAdd') + '">'
+      h += '<button id="btn-gsl-next" class="btn btn-primary">' + $.t('sl.next') + '</button>'
       h += '<ul class="pending-country-list"></ul>'
       @$el.append h
       @
@@ -138,11 +135,11 @@ jQuery ->
       return
     terminate: ->
       super()
-      info "#{@name} exhausted."
+      info @name + $.t 'prompt.exhausted'
 
   class GSLView extends BaseSLView
     initialize: ->
-      super "General Speaker's List", 'gsl-view'
+      super 'gsl-view'
       @listenTo @model, "change:time", @renderTimer
       log '\t$ GSLView initialized.', DEBUG
 
@@ -151,14 +148,13 @@ jQuery ->
       _.extend {}, super, "click #btn-exit-mc": 'terminate'
     initialize: (ops)->
       @params = ops  # topic, time_tot, time_each
-      super "Moderacted Caucus", 'mc-view'
-      log '\t$ MCView initialized.', DEBUG
+      super 'mc-view'
     render: ->
-      @$el.html "<div class=\"mc-title\">Topic: #{@params.topic}</div><hr>"
+      @$el.html "<div class=\"mc-title\">#{$.t('mc.topic')}#{@params.topic}</div><hr>"
       @renderCurrent()
       @renderList()
       @renderTimer()
-      @$el.append '<hr><button class="btn btn-info" id="btn-exit-mc">Close this Moderated Caucus</button>'
+      @$el.append '<hr><button class="btn btn-info" id="btn-exit-mc">' + $.t('mc.close') + '</button>'
       $("#sl-add-country").tooltip(trigger: 'focus').focus()
       @
     renderTimer: ->
@@ -169,13 +165,12 @@ jQuery ->
     events:
       "click #btn-exit-umc": "terminate"
     initialize: (ops) ->
-      super 'UMCView', 'umc-view'
+      super 'umc-view'
       timerView.setTime ops.time
       @render()
-      log '\t$ UMCView initialized.', DEBUG
     render: ->
-      h =  '<div class="mc-title">Un-moderated Caucus</div>'
-      h += '<button class="btn btn-info" id="btn-exit-umc">Close this Un-moderated Caucus</button>'
+      h =  '<div class="mc-title">#{@name}</div>'
+      h += '<button class="btn btn-info" id="btn-exit-umc">' + $.t('mc.close') + '</button>'
       @$el.html h
 
   class RollCallView extends BaseView
@@ -188,14 +183,14 @@ jQuery ->
       @countryList = Master.get 'countryList'
       Master.set 'presentList', []
       appView.disable 'btn-roll-call'
-      super 'RollCallView', 'roll-call-view'
+      super 'roll-call-view'
     render: ->
       if @current == @countryList.length
         @terminate()
       else
         h =  '<div class="highlight-country">' + this.countryList[this.current] + '</div>'
-        h += '<button class="btn btn-success" id="btn-roll-call-present">Present (P)</button>'
-        h += '<button class="btn btn-warning" id="btn-roll-call-absent">Absent (A)</button>'
+        h += '<button class="btn btn-success" id="btn-roll-call-present">' + $.t('rollCall.present') + ' (P)</button>'
+        h += '<button class="btn btn-warning" id="btn-roll-call-absent">' + $.t('rollCall.absent') + ' (A)</button>'
         h += '<ul class="pending-country-list">'
         h += "<li>#{c}</li>" for c in @countryList[@current + 1 .. @current + 5]
         h += '<li>...</li>'  if @current + 5 < @countryList.length
@@ -213,7 +208,7 @@ jQuery ->
       @render()
     terminate: ->
       super()
-      success 'Roll Call completed.'
+      success $.t 'prompt.rollCallCompleted'
       appView.enable 'btn-roll-call'
       appView.enable 'btn-gsl'
       appView.enable 'btn-motion'
@@ -255,6 +250,8 @@ jQuery ->
           clist
       appView.enable 'btn-roll-call'
       log 'Session successfully initialized!', PRODUCT
+      timelineView.addTitle $.t 'log.sessionid', id: Master.get('sessionInfo').sessionid
+      tlog 'initComplete'
       @$el.modal 'hide'
 
   class TimerView extends Backbone.View
@@ -272,7 +269,7 @@ jQuery ->
       @setStart()
       log '$ TimerView initialized.', DEBUG
     setStart: ->
-      $("#btn-timer-toggle").html "Start"
+      $("#btn-timer-toggle").html $.t 'btn.start'
     setTime: (t, tt) ->
       tt ?= t
       @$t.timer time:t
@@ -281,11 +278,11 @@ jQuery ->
       if @running
         @$timers.timer 'stop'
         @running = false
-        $("#btn-timer-toggle").html "Continue"
+        $("#btn-timer-toggle").html  $.t 'btn.continue'
       else
         @$timers.timer 'start'
         @running = true
-        $("#btn-timer-toggle").html "Pause"
+        $("#btn-timer-toggle").html  $.t 'btn.pause'
     reset: ->
       @toggle()  if @running
       @$t.timer 'reset'
@@ -316,16 +313,15 @@ jQuery ->
         $("#btn-toggle-fullscreen").html (if screenfull.isFullscreen then 'Exit Fullscreen' else 'Fullscreen Mode')
     togglePause: ->
       if Master.get 'paused'
-        log 'Session resumed.', PRODUCT
+        log $.t('log.sessionResumed'), PRODUCT
         return false
       else
-        log 'Session paused.', PRODUCT
-        bootbox.dialog "<span class=\"suspend-title\">This session is temporarily suspended.</span><hr>",
+        log $.t('log.sessionPaused'), PRODUCT
+        bootbox.dialog '<span class="suspend-title">' + $.t('prompt.sessionSuspended') + '</span><hr>',
           [
-            'label'   : 'Resume Session'
+            'label'   : $.t('prompt.sessionResume')
             'class'   : ''
-            'callback': ->
-              @togglePause
+            'callback': -> @togglePause
           ]
     initRollCall: ->
       @rollCallView = new RollCallView()
@@ -333,17 +329,18 @@ jQuery ->
       @gsl = new SpeakersList()
       @gslView = new GSLView(model: @gsl)
     motionMC: ->
-      @motionVote 'Motion for Moderated Caucus', 'm1', ->
-        bootbox.dialog $("#tpl-init-mc").html(),
-          [
-              'label'   : 'Cancel'
-              'class'   : ''
-              'callback': ->
-                info "This moderated caucus is cancelled."
-            ,
-              'label'   : 'OK'
-              'class'   : 'btn-primary'
-              'callback': ->
+      _mv = @motionVote
+      bootbox.dialog $("#tpl-init-mc").html(),
+        [
+            'label'   : $.t 'btn.cancel'
+            'class'   : ''
+            'callback': ->
+              info $.t "mc.promptCancelled"
+          ,
+            'label'   : $.t 'btn.ok'
+            'class'   : 'btn-primary'
+            'callback': ->
+              _mv $.t('motion.mc'), 'm1', ->
                 log $("#init-mc-topic").val()
                 @mcView = new MCView(
                   model: new SpeakersList,
@@ -351,25 +348,25 @@ jQuery ->
                   time_tot  : $("#init-mc-total-time").val()
                   time_each : $("#init-mc-each-time").val()
                 )
-          ]
+        ]
     motionUMC: ->
-      @motionVote 'Motion for Un-moderated Caucus', 'm1', ->
-        bootbox.prompt "Enter UMC Time (seconds):", (t) ->
+      _mv = @motionVote
+      bootbox.prompt $.t('umc.promptTime'), (t) ->
+        @motionVote $.t('motion.umc'), 'm1', ->
           @umcView = new UMCView(time: t)
     motionGSLTime: ->
       if not @gsl?
-        error "General Speaker's List must first be initialized!"
+        error $.t 'error.noGSL'
         return
       _gsl = @gsl
-      @motionVote "Motion to Change General Speaking Time", 'm1', ->
-        bootbox.prompt "Enter new Speaking Time (seconds):", (t) ->
+      @motionVote $.t('motion.changeGSTime'), 'm1', ->
+        bootbox.prompt $.t('changeGSTime.promptTime'), (t) ->
           _gsl.set 'time': t
-          success "General Speech's Time is changed to #{t} seconds."
+          success $.t('changeGSTime.success', t: t)
 
     motionVote: (title, pass, callback) ->
       if not Master.get('sessionStats').cnt?
-        error "Session Statistics must first be initialized!"
-        info "The #{title} fails."
+        error $.t 'error.initSessionFirst'
         return false
       if pass == 'm2'
         pass = Master.get('sessionStats').m2.value
@@ -378,17 +375,16 @@ jQuery ->
       #else case number
       else
         pass = Master.get('sessionStats').m1.value
-      bootbox.dialog "<div class=\"motion-title\">#{title}</div>This motion needs <code class=\"huge-number\">#{pass}</code> votes in favor to pass.",
+      bootbox.dialog "<div class=\"motion-title\">#{title}</div>#{$.t ('motion.promptBefore')} <code class=\"huge-number\">#{pass}</code> #{$.t ('motion.promptAfter')}",
         [
-            'label'   : 'Fail'
+            'label'   : $.t 'btn.fail'
             'class'   : 'btn-warning'
-            'callback': ->
-              info "The #{title} fails."
+            'callback': -> info $.t('motion.failBefore') + title + $.t('motion.failAfter')
           ,
-            'label'   : 'Pass'
+            'label'   : $.t 'btn.pass'
             'class'   : 'btn-success'
             'callback': ->
-              success "The #{title} passes."
+              success info $.t('motion.passBefore') + title + $.t('motion.passAfter')
               callback()
         ]
     readXML: (e) ->
@@ -415,9 +411,10 @@ jQuery ->
   class IdleView extends Backbone.View
     el: $ "#main-activity"
     initialize: ->
+      Master.register @, $.t('idle.idle'), 'idle'
       @render()
     render: ->
-      @$el.html '<p>There is currently no active activity.</p>'
+      @$el.html $.t 'idle.msg'
       log 'IdleView rendered', DEBUG
 
   class Item extends Backbone.Model
@@ -434,7 +431,9 @@ jQuery ->
     initialize: ->
       @render()
     add: (s) ->
-      @$el.html '<li><a href="#">' + now() + ' ' + s + '</a></li>\n'
+      @$el.append '<li><a href="#">' + now() + ' ' + s + '</a></li>\n'
+    addTitle: (s) ->
+      @$el.append '<li class="nav-header">' + s + '</li>\n'
     render: ->
       log '$ TimelineView rendered', DEBUG
 
@@ -444,10 +443,7 @@ jQuery ->
       presentList: []
       sessionStats: []
       sessionInfo: {}
-      ongoing:
-        view: new IdleView()
-        name: 'idle'
-        cls : 'idle'
+      ongoing: null
       threadStack: []
       variables:
         globalPrompt: 'This is a development version of mun.js'
@@ -460,9 +456,10 @@ jQuery ->
       log '@ Object MasterControl created.', DEBUG
     register: (v, n, c) ->
       old = @get('ongoing')
-      @get('threadStack').push old
-      appView.unrender old
-      old.view.undelegateEvents()
+      if not (old is null)
+        @get('threadStack').push old
+        appView.unrender old
+        old.view.undelegateEvents()
 
       @set 'ongoing',
         view: v
@@ -488,16 +485,16 @@ jQuery ->
       p = @get('presentList').length
       @set 'sessionStats',
         cnt:
-          key: 'Country Present'
+          key: $.t 'sessionInfo.cnt'
           value: p
         m1:
-          key: 'Simple Majority'
+          key: $.t 'sessionInfo.m1'
           value: Math.floor(p / 2) + 1
         m2:
-          key: 'Absolute Majority'
+          key: $.t 'sessionInfo.m2'
           value: Math.floor(p * 2 / 3) + 1
         spm:
-          key: 'Sponsors Minimum'
+          key: $.t 'sessionInfo.spm'
           value: Math.round(p / 5)
     addPresentCountry: (c) ->
       @get('presentList').push c
@@ -510,7 +507,6 @@ jQuery ->
 
   class AppView extends Backbone.View
     initialize: ->
-      log i18n.t 'ui.settings'
       @listenTo Master, 'change:ongoing', @render
       @listenTo Master, 'change:variables', @renderVars
       @listenTo Master, 'change:sessionInfo', @renderTitle
@@ -541,7 +537,6 @@ jQuery ->
       $('#' + id).attr('disabled', true)
       log id + ' disabled', DEBUG
 
-
   i18n.init
     ns: 'app'
     lng: 'zh-CN'
@@ -552,6 +547,7 @@ jQuery ->
     $('html').i18n();
 
   Master = new MasterControl()
+  idleView = new IdleView()
 
   appView = new AppView()
   timelineView = new TimelineView()
@@ -562,10 +558,8 @@ jQuery ->
   initModal = new InitModalView()
   settModal = new SettingsModalView()
 
-  timelineView.add $.t('log.init-complete')
-
   Master.trigger('change:variables')
-  # initModal.initSession()
-  # controlView.initRollCall()
+  initModal.initSession()
+  controlView.initRollCall()
 
   return

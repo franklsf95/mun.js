@@ -1,14 +1,96 @@
 {
+    "btn": {
+        "cancel": "取消",
+        "continue": "继续",
+        "fail": "失败",
+        "ok": "好",
+        "pass": "通过",
+        "pause": "暂停",
+        "reset": "重置",
+        "start": "启动"
+    },
+    "changeGSTime": {
+        "promptTime": "请输入主发言时长（秒）：",
+        "success": "主发言名单时长已调整为 __t__ 秒"
+    },
+    "error": {
+        "initSessionFirst": "请先统计会议出席人数！",
+        "noGSL": "主发言名单未开启！"
+    },
+    "idle": {
+        "idle": "无议程",
+        "msg": "当前没有进行中的议程。"
+    },
+    "log": {
+        "initComplete": "会期初始化完成。",
+        "sessionid": "第 __id__ 会期",
+        "sessionPaused": "会议已暂停",
+        "sessionResumed": "会议已恢复"
+    },
     "main": {
         "title": "模联.js"
     },
-    "ui": {
-        "settings": "设置"
+    "mc": {
+        "close": "结束磋商",
+        "promptCancelled": "该有主持核心磋商未获通过。",
+        "topic": "议题："
+    },
+    "motion": {
+        "changeGSTime": "动议修改主发言名单时长",
+        "failBefore": "",
+        "failAfter": "失败。",
+        "mc": "动议有主持核心磋商",
+        "umc": "动议自由磋商",
+        "passBefore": "",
+        "passAfter": "通过。",
+        "promptBefore": "该动议需要",
+        "promptAfter": "票赞成方可通过。"
     },
     "prompt": {
-        "pending-init": "单击“初始化”以启动会议。"
+        "error": "错误：",
+        "exhausted": "已经结束。",
+        "notice": "提示：",
+        "pendingInit": "单击“初始化”以启动会议。",
+        "rollCallNotStarted": "会议尚未开始点名。",
+        "rollCallCompleted": "点名完成！",
+        "sessionResume": "继续会议",
+        "sessionSuspended": "会议已暂停。",
+        "success": "成功：",
+        "warning": "警告！"
     },
-    "log": {
-        "init-complete": "会期初始化完成。"
+    "rollCall": {
+        "present": "出 席",
+        "absent": "缺 席"
+    },
+    "sessionInfo": {
+        "cnt": "出席国家数",
+        "m1": "简单多数",
+        "m2": "绝对多数",
+        "spm": "20%出席数"
+    },
+    "sl": {
+        "enterToAdd": "按回车键添加发言者",
+        "next": "下一个",
+        "ready": "(添加国家)"
+    },
+    "timer": {
+        "totalTime": "总时间："
+    },
+    "ui": {
+        "controls": "主控制台",
+        "ongoing": "正在进行：",
+        "sessionStats": "会议信息",
+        "settings": "设置",
+        "timeline": "时间线",
+        "timer": "计时器"
+    },
+    "umc": {
+        "promptTime": "请输入自由磋商时长（秒）："
+    },
+    "views": {
+        "gsl-view": "主发言名单",
+        "mc-view": "有主持核心磋商",
+        "roll-call-view": "点名",
+        "umc-view": "自由磋商"
     }
 }
