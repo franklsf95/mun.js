@@ -178,6 +178,9 @@ jQuery ->
     events:
       "click #btn-roll-call-present": "countryPresent"
       "click #btn-roll-call-absent":  "countryAbsent"
+    keys:
+      "p": "countryPresent"
+      "a": "countryAbsent"
     initialize: ->
       @current = 0
       @countryList = Master.get 'countryList'
@@ -522,9 +525,10 @@ jQuery ->
       $("#main-wrapper").removeClass cls
       $("#main-activity").html ''
     renderTitle: ->
-      $("#title-committee").html  Master.get('sessionInfo')['committee']
-      $("#title-abbr").html       Master.get('sessionInfo')['abbr']
-      $("#title-sessionid").html  Master.get('sessionInfo')['sessionid']
+      h = Master.get('sessionInfo')['committee']
+      h += ' (' + Master.get('sessionInfo')['abbr'] +  ') '
+      h += $.t 'log.sessionid', id: Master.get('sessionInfo').sessionid
+      $("#session-title").html h
     renderVars: ->
       vars = Master.get('variables')
       $("#global-prompt").html vars.globalPrompt
@@ -534,12 +538,12 @@ jQuery ->
       $('#' + id).removeAttr 'disabled'
       log id + ' enabled', DEBUG
     disable: (id) ->
-      $('#' + id).attr('disabled', true)
+      $('#' + id).attr 'disabled', true
       log id + ' disabled', DEBUG
 
   i18n.init
     ns: 'app'
-    lng: 'zh-CN'
+    # lng: 'zh-CN'
     debug: THRESHOLD >= DEBUG
     getAsync: false
     resGetPath: 'i18n/__lng__/__ns__.json'
