@@ -99,7 +99,11 @@ jQuery ->
       @renderCurrent()
       @renderList()
       @renderTimer()
-      $("#sl-add-country").tooltip(trigger: 'focus').focus()
+      $("#sl-add-country").tooltip
+        trigger: 'focus'
+      .typeahead
+        source: -> Master.get('presentList')
+      .focus()
       @
     renderCurrent: ->
       country = @model.get('list')[@model.get 'current']
@@ -179,7 +183,8 @@ jQuery ->
       "click #btn-roll-call-present": "countryPresent"
       "click #btn-roll-call-absent":  "countryAbsent"
     keys:
-      "p": "countryPresent"
+      "p": ->
+        @countryPresent()
       "a": "countryAbsent"
     initialize: ->
       @current = 0
@@ -300,58 +305,29 @@ jQuery ->
   class ControlView extends Backbone.View
     el: $ "#control-wrapper"
     initialize: ->
+      @mcModal = new MotionMCView()
       log '$ ControlView initialized.', DEBUG
     events:
       "click #btn-toggle-fullscreen": "toggleFullscreen"
-      "click #btn-pause"            : "togglePause"
+      "click #btn-pause"            : "pauseSession"
       "click #btn-roll-call"        : "initRollCall"
       "click #btn-gsl"              : "initGeneralSL"
       "click #btn-motion-gsl-time"  : "motionGSLTime"
-      "click #btn-motion-mc"        : "motionMC"
+      # "click #btn-motion-mc"        : "motionMC"
       "click #btn-motion-umc"       : "motionUMC"
       "change #input-xml-log"       : "readXML"
     toggleFullscreen: ->
       if screenfull.enabled
         screenfull.toggle()
         $("#btn-toggle-fullscreen").html (if screenfull.isFullscreen then 'Exit Fullscreen' else 'Fullscreen Mode')
-    togglePause: ->
-      if Master.get 'paused'
-        log $.t('log.sessionResumed'), PRODUCT
-        return false
-      else
-        log $.t('log.sessionPaused'), PRODUCT
-        bootbox.dialog '<span class="suspend-title">' + $.t('prompt.sessionSuspended') + '</span><hr>',
-          [
-            'label'   : $.t('prompt.sessionResume')
-            'class'   : ''
-            'callback': -> @togglePause
-          ]
+    pauseSession: ->
+      welcomeView.msg($.t('welcome.paused')).render()
+      log $.t('log.sessionPaused'), PRODUCT
     initRollCall: ->
       @rollCallView = new RollCallView()
     initGeneralSL: ->
       @gsl = new SpeakersList()
       @gslView = new GSLView(model: @gsl)
-    motionMC: ->
-      _mv = @motionVote
-      bootbox.dialog $("#tpl-init-mc").html(),
-        [
-            'label'   : $.t 'btn.cancel'
-            'class'   : ''
-            'callback': ->
-              info $.t "mc.promptCancelled"
-          ,
-            'label'   : $.t 'btn.ok'
-            'class'   : 'btn-primary'
-            'callback': ->
-              _mv $.t('motion.mc'), 'm1', ->
-                log $("#init-mc-topic").val()
-                @mcView = new MCView(
-                  model: new SpeakersList,
-                  topic     : $("#init-mc-topic").val()
-                  time_tot  : $("#init-mc-total-time").val()
-                  time_each : $("#init-mc-each-time").val()
-                )
-        ]
     motionUMC: ->
       _mv = @motionVote
       bootbox.prompt $.t('umc.promptTime'), (t) ->
@@ -366,30 +342,6 @@ jQuery ->
         bootbox.prompt $.t('changeGSTime.promptTime'), (t) ->
           _gsl.set 'time': t
           success $.t('changeGSTime.success', t: t)
-
-    motionVote: (title, pass, callback) ->
-      if not Master.get('sessionStats').cnt?
-        error $.t 'error.initSessionFirst'
-        return false
-      if pass == 'm2'
-        pass = Master.get('sessionStats').m2.value
-      else if pass == 'm1'
-        pass = Master.get('sessionStats').m1.value
-      #else case number
-      else
-        pass = Master.get('sessionStats').m1.value
-      bootbox.dialog "<div class=\"motion-title\">#{title}</div>#{$.t ('motion.promptBefore')} <code class=\"huge-number\">#{pass}</code> #{$.t ('motion.promptAfter')}",
-        [
-            'label'   : $.t 'btn.fail'
-            'class'   : 'btn-warning'
-            'callback': -> info $.t('motion.failBefore') + title + $.t('motion.failAfter')
-          ,
-            'label'   : $.t 'btn.pass'
-            'class'   : 'btn-success'
-            'callback': ->
-              success info $.t('motion.passBefore') + title + $.t('motion.passAfter')
-              callback()
-        ]
     readXML: (e) ->
       file = e.target.files[0]
       reader = new FileReader()
@@ -398,6 +350,28 @@ jQuery ->
           $("#xml-content").html e.target.result
       )(file)
       reader.readAsText file, 'UTF-8'
+
+  class MotionMCView extends Backbone.View
+    el: $ "#modal-motion-mc"
+    events:
+      "show": "render"
+      "click #motion-mc-pass": "pass"
+      "click #motion-mc-fail": "fail"
+    initialize: ->
+      log '$ MotionMCView initialized.', DEBUG
+    render: ->
+      $("#motion-mc-pass-vote").html Master.get('sessionStats').m1.value
+    pass: ->
+      @mcView = new MCView
+        model: new SpeakersList,
+        topic     : $("#motion-mc-topic").html()
+        time_tot  : $("#motion-mc-total-time").html()
+        time_each : $("#motion-mc-each-time").html()
+      success $.t('motion.passBefore') + $.t('motion.mc') + $.t('motion.passAfter')
+      @$el.modal 'hide'
+    fail: ->
+      info $.t('motion.failBefore') + $.t('motion.mc') + $.t('motion.failAfter')
+      @$el.modal 'hide'
 
   class StatsView extends Backbone.View
     el: $ "#dl-session-stats"
@@ -440,6 +414,24 @@ jQuery ->
     render: ->
       log '$ TimelineView rendered', DEBUG
 
+  class WelcomeView extends Backbone.View
+    el: $ "#welcome-container"
+    message: "Hello"
+    events:
+      "click #btn-welcome-hide": "unrender"
+    initialize: ->
+      @render()
+    render: ->
+      @$el.fadeIn 1000
+      $("#welcome-message").html @message
+      log 'WelcomeView entered', DEBUG
+    unrender: ->
+      @$el.fadeOut 1000
+      log 'WelcomeView exited', DEBUG
+    msg: (s) ->
+      @message = s
+      @
+
   class MasterControl extends Backbone.Model
     defaults:
       countryList: []
@@ -449,11 +441,10 @@ jQuery ->
       ongoing: null
       threadStack: []
       variables:
-        globalPrompt: 'This is a development version of mun.js'
+        globalPrompt: -> $.t 'prompt.defaultGlobal'
         autoFadeTime: 3000
         mcDefaultTimeTotal: 300 # not-used yet
         mcDefaultTimeEach: 60   # not-used yet
-      paused: false
     initialize: ->
       @on 'change:presentList', @calculate
       log '@ Object MasterControl created.', DEBUG
@@ -533,7 +524,6 @@ jQuery ->
       vars = Master.get('variables')
       $("#global-prompt").html vars.globalPrompt
       log "> Global variables applied."
-
     enable: (id) ->
       $('#' + id).removeAttr 'disabled'
       log id + ' enabled', DEBUG
@@ -552,6 +542,8 @@ jQuery ->
 
   Master = new MasterControl()
   idleView = new IdleView()
+  welcomeView = new WelcomeView()
+  welcomeView.unrender()
 
   appView = new AppView()
   timelineView = new TimelineView()
@@ -561,6 +553,9 @@ jQuery ->
 
   initModal = new InitModalView()
   settModal = new SettingsModalView()
+
+  $(".xe").editable
+    mode: 'inline'
 
   Master.trigger('change:variables')
   initModal.initSession()

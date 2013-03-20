@@ -3,7 +3,9 @@
         "cancel": "取消",
         "close": "关闭",
         "continue": "继续",
+        "enter-session": "进入会议界面",
         "fail": "失败",
+        "init": "初始化 (Ctrl+Enter)",
         "ok": "好",
         "pass": "通过",
         "pause": "暂停",
@@ -39,7 +41,6 @@
         "committee": "委员会",
         "countryList": "与会国家列表",
         "general": "通用",
-        "init": "初始化",
         "sessionid": "会期",
         "title": "初始化会议",
         "topic": "议题"
@@ -56,9 +57,9 @@
     "mc": {
         "close": "结束磋商",
         "initTitle": "有主持核心磋商",
-        "promptCancelled": "该有主持核心磋商未获通过。",
-        "timeEach": "发言时长",
+        "timeEach": "发言时长：",
         "topic": "议题：",
+        "topicEdit": "单击文字进行编辑",
         "totalTime": "总时长："
     },
     "motion": {
@@ -73,6 +74,7 @@
         "promptAfter": "票赞成方可通过。"
     },
     "prompt": {
+        "defaultGlobal": "欢迎来到2013年北京市高中生模拟联合国暑期研讨会",
         "error": "错误：",
         "exhausted": "已经结束。",
         "notice": "提示：",
@@ -100,6 +102,7 @@
         "ready": "(添加国家)"
     },
     "timer": {
+        "sec": "秒",
         "totalTime": "总时间："
     },
     "ui": {
@@ -118,5 +121,9 @@
         "mc-view": "有主持核心磋商",
         "roll-call-view": "点名",
         "umc-view": "自由磋商"
+    },
+    "welcome": {
+        "welcome": "欢迎！",
+        "paused": "会议已暂停。"
     }
 }

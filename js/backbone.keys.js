@@ -83,7 +83,7 @@
 
         // Allow pr view what specific event to use
         // Keydown is defaulted as it allows for press-and-hold
-        bindKeysOn : 'keydown',
+        bindKeysOn : 'keyup',
 
         // The Backbone-y way would be to have
         // keys scoped to `this.el` as default,

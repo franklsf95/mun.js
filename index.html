@@ -32,6 +32,12 @@
       </div>
     </nav>
 
+    <div class="overflow" id="welcome-container">
+      <div id="welcome-title">单击此处编辑会议名称</div>
+      <div id="welcome-message"></div>
+      <button class="btn btn-primary" id="btn-welcome-hide" data-i18n="btn.enter-session"></button>
+    </div>
+
     <div class="container" id="main-container">
       <div class="row">
         <header class="span12" id="header-wrapper">
@@ -75,19 +81,19 @@
 
       <div class="wrapper" id="control-wrapper">
         <div class="wrapper-name" data-i18n="ui.controls"></div>
-        <button class="btn" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize</button>
+        <button class="btn" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize (⌥I)</button>
         <button class="btn" id="btn-roll-call" disabled>Roll Call</button>
         <button class="btn" id="btn-gsl" disabled>General Speaker's List</button>
         <div class="btn-group dropup">
           <button class="btn btn-primary dropdown-toggle" id="btn-motion" data-toggle="dropdown" disabled>Motion <span class="caret"></span></button>
           <ul class="dropdown-menu">
-            <li><a href="#" id="btn-motion-mc">Moderated Caucus</a></li>
+            <li><a href="#" id="btn-motion-mc" data-toggle="modal" data-target="#modal-motion-mc">Moderated Caucus</a></li>
             <li><a href="#" id="btn-motion-umc">Un-moderated Caucus</a></li>
             <li class="divider"></li>
             <li><a href="#" id="btn-motion-gsl-time">Change General Speech Time</a></li>
           </ul>
         </div>
-        <button class="btn btn-primary" id="btn-toggle-fullscreen">Fullscreen Mode</button>
+        <button class="btn btn-primary" id="btn-toggle-fullscreen">Fullscreen Mode (⇧⌘F)</button>
         <button class="btn btn-primary" id="btn-pause">Pause Session</button>
         <hr>
         <input type="file" id="input-xml-log"/>
@@ -95,122 +101,122 @@
       </div> <!-- /control-wrapper -->
     </div> <!-- /container -->
 
-    <div class="modal hide fade" id="modal-settings">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 data-i18n="global.title"></h3>
-      </div>
-      <div class="modal-body">
-          <ul id="modal-settings-tabs" class="nav nav-tabs">
-            <li class="active"><a href="#modal-settings-general" data-toggle="tab" data-i18n="global.general"></a></li>
-            <li><a href="#modal-settings-interface" data-toggle="tab" data-i18n="global.interface"></a></li>
-            <li><a href="#modal-settings-conference" data-toggle="tab" data-i18n="global.conference"></a></li>
-          </ul>
-          <div id="modal-settings-content" class="tab-content">
-            <div class="tab-pane active" id="modal-settings-general">
-              <form class="form-horizontal">
-                <div class="control-group">
-                  <label for="input-globalPrompt" class="control-label" data-i18n="global.globalPrompt"></label>
-                  <div class="controls">
-                    <input type="text" id="input-globalPrompt" class="span4">
-                  </div>
-                </div>
-              </form>
-            </div><!-- /tab-pane -->
-            <div class="tab-pane" id="modal-settings-interface">
-              <form class="form-horizontal">
-                <div class="control-group">
-                  <label for="input-autoFadeTime" class="control-label" data-i18n="global.autoFadeTime"></label>
-                  <div class="controls input-append">
-                    <input type="text" id="input-autoFadeTime" class="span2">
-                    <span class="add-on">ms</span>
-                  </div>
-                </div>
-              </form>
-            </div><!-- /tab-pane -->
-            <div class="tab-pane" id="modal-settings-conference">
-              <form class="form-horizontal">
-                <div class="control-group">
-                  <label for="input-mcDefaultTimeTotal" class="control-label" data-i18n="global.mcDefaultTimeTotal"></label>
-                  <div class="controls input-append">
-                    <input type="text" id="input-mcDefaultTimeTotal" class="span2">
-                    <span class="add-on">&nbsp;sec</span>
-                  </div>
-                </div>
-                <div class="control-group">
-                  <label for="input-mcDefaultTimeEach" class="control-label" data-i18n="global.mcDefaultTimeEach"></label>
-                  <div class="controls input-append">
-                    <input type="text" id="input-mcDefaultTimeEach" class="span2">
-                    <span class="add-on">&nbsp;sec</span>
-                  </div>
-                </div>
-              </form>
-            </div><!-- /tab-pane -->
-          </div><!-- /tab-content -->
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal" data-i18n="btn.close"></a>
-        <a href="#" class="btn btn-primary" id="submit-global-settings" data-i18n="btn.save"></a>
-      </div>
-    </div> <!-- /modal -->
+<div class="modal hide fade" id="modal-settings">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3 data-i18n="global.title"></h3>
+  </div>
+  <div class="modal-body">
+      <ul id="modal-settings-tabs" class="nav nav-tabs">
+        <li class="active"><a href="#modal-settings-general" data-toggle="tab" data-i18n="global.general"></a></li>
+        <li><a href="#modal-settings-interface" data-toggle="tab" data-i18n="global.interface"></a></li>
+        <li><a href="#modal-settings-conference" data-toggle="tab" data-i18n="global.conference"></a></li>
+      </ul>
+      <div id="modal-settings-content" class="tab-content">
+        <div class="tab-pane active" id="modal-settings-general">
+          <form class="form-horizontal">
+            <div class="control-group">
+              <label for="input-globalPrompt" class="control-label" data-i18n="global.globalPrompt"></label>
+              <div class="controls">
+                <input type="text" id="input-globalPrompt" class="span4">
+              </div>
+            </div>
+          </form>
+        </div><!-- /tab-pane -->
+        <div class="tab-pane" id="modal-settings-interface">
+          <form class="form-horizontal">
+            <div class="control-group">
+              <label for="input-autoFadeTime" class="control-label" data-i18n="global.autoFadeTime"></label>
+              <div class="controls input-append">
+                <input type="text" id="input-autoFadeTime" class="span2">
+                <span class="add-on">ms</span>
+              </div>
+            </div>
+          </form>
+        </div><!-- /tab-pane -->
+        <div class="tab-pane" id="modal-settings-conference">
+          <form class="form-horizontal">
+            <div class="control-group">
+              <label for="input-mcDefaultTimeTotal" class="control-label" data-i18n="global.mcDefaultTimeTotal"></label>
+              <div class="controls input-append">
+                <input type="text" id="input-mcDefaultTimeTotal" class="span2">
+                <span class="add-on">&nbsp;sec</span>
+              </div>
+            </div>
+            <div class="control-group">
+              <label for="input-mcDefaultTimeEach" class="control-label" data-i18n="global.mcDefaultTimeEach"></label>
+              <div class="controls input-append">
+                <input type="text" id="input-mcDefaultTimeEach" class="span2">
+                <span class="add-on">&nbsp;sec</span>
+              </div>
+            </div>
+          </form>
+        </div><!-- /tab-pane -->
+      </div><!-- /tab-content -->
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal" data-i18n="btn.close"></a>
+    <a href="#" class="btn btn-primary" id="submit-global-settings" data-i18n="btn.save"></a>
+  </div>
+</div> <!-- /modal -->
 
-    <div class="modal hide fade" id="modal-init">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 data-i18n="init.title"></h3>
-      </div>
-      <div class="modal-body">
-          <ul id="modal-init-tabs" class="nav nav-tabs">
-            <li class="active"><a href="#modal-init-general" data-toggle="tab" data-i18n="init.general"></a></li>
-            <li><a href="#modal-init-advanced" data-toggle="tab" data-i18n="init.advanced"></a></li>
-          </ul>
-          <div id="modal-init-content" class="tab-content">
-            <div class="tab-pane fade in active" id="modal-init-general">
-              <form class="form-horizontal">
-                <div class="control-group">
-                  <label for="init-committee" class="control-label" data-i18n="init.committee"></label>
-                  <div class="controls">
-                    <input type="text" id="init-committee" class="span3" value="United Nations Security Council">
-                  </div>
-                </div>
-                <div class="control-group">
-                  <label for="init-abbr" class="control-label" data-i18n="init.abbr"></label>
-                  <div class="controls">
-                    <input type="text" id="init-abbr" class="span3" value="UNSC">
-                  </div>
-                </div>
-                <div class="control-group">
-                  <label for="init-topic" class="control-label" data-i18n="init.topic"></label>
-                  <div class="controls">
-                    <input type="text" id="init-topic" class="span3">
-                  </div>
-                </div>
-                <div class="control-group">
-                  <label for="init-sessionid" class="control-label" data-i18n="init.sessionid"></label>
-                  <div class="controls">
-                    <input type="text" id="init-sessionid" class="span3" value="1">
-                  </div>
-                </div>
-              </form>
-              <div class="modal-form-second-row">
-                <label for="init-country-list" data-i18n="init.countryList"></label>
-                <textarea id="init-country-list" class="span4" rows="10">
+<div class="modal hide fade" id="modal-init">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3 data-i18n="init.title"></h3>
+  </div>
+  <div class="modal-body">
+      <ul id="modal-init-tabs" class="nav nav-tabs">
+        <li class="active"><a href="#modal-init-general" data-toggle="tab" data-i18n="init.general"></a></li>
+        <li><a href="#modal-init-advanced" data-toggle="tab" data-i18n="init.advanced"></a></li>
+      </ul>
+      <div id="modal-init-content" class="tab-content">
+        <div class="tab-pane fade in active" id="modal-init-general">
+          <form class="form-horizontal">
+            <div class="control-group">
+              <label for="init-committee" class="control-label" data-i18n="init.committee"></label>
+              <div class="controls">
+                <input type="text" id="init-committee" class="span3" value="United Nations Security Council">
+              </div>
+            </div>
+            <div class="control-group">
+              <label for="init-abbr" class="control-label" data-i18n="init.abbr"></label>
+              <div class="controls">
+                <input type="text" id="init-abbr" class="span3" value="UNSC">
+              </div>
+            </div>
+            <div class="control-group">
+              <label for="init-topic" class="control-label" data-i18n="init.topic"></label>
+              <div class="controls">
+                <input type="text" id="init-topic" class="span3">
+              </div>
+            </div>
+            <div class="control-group">
+              <label for="init-sessionid" class="control-label" data-i18n="init.sessionid"></label>
+              <div class="controls">
+                <input type="text" id="init-sessionid" class="span3" value="1">
+              </div>
+            </div>
+          </form>
+          <div class="modal-form-second-row">
+            <label for="init-country-list" data-i18n="init.countryList"></label>
+            <textarea id="init-country-list" class="span4" rows="10">
 China
 France
 Japan</textarea>
-              </div>
-            </div>
-            <div class="tab-pane fade" id="modal-init-advanced">
-              <p>Hello</p>
-            </div>
-          </div><!-- /tab-content -->
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal" data-i18n="btn.cancel"></a>
-        <a href="#" class="btn btn-info" id="submit-init" data-i18n="init.init"></a>
-      </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="modal-init-advanced">
+          <p>Hello</p>
+        </div>
+      </div><!-- /tab-content -->
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal" data-i18n="btn.cancel"></a>
+    <a href="#" class="btn btn-info" id="submit-init" data-i18n="btn.init"></a>
+  </div>
+</div> <!-- /modal -->
 
-    </div> <!-- /modal -->
     <script src="js/jquery.js"></script>
     <script src="js/underscore.js"></script>
     <script src="js/backbone.js"></script>
@@ -218,28 +224,47 @@ Japan</textarea>
 
     <script src="js/jquery.timer.js"></script>
     <script src="js/backbone.keys.js"></script>
-    <script src="js/bootstrap.js"></script>
-    <script src="js/bootbox.js"></script>
     <script src="js/screenfull.js"></script>
+
+    <script src="js/bootstrap.js"></script>
+    <script src="js/bootstrap-editable.js"></script>
+    <script src="js/bootbox.js"></script>
 
     <script src="mun.js"></script>
 
-    <script type="text/template" id="tpl-init-sl">
-<div class="modal hide fade">
+<div class="modal hide fade" id="modal-motion-mc">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h3>Speaker''s List Initialization</h3>
+    <h2 data-i18n="motion.mc"></h2>
   </div>
   <div class="modal-body">
-    <label for="init-country-list">Country List</label>
-    <textarea id="init-country-list" class="span4" rows="10"></textarea>
+    <div class="motion-mc-item">
+      <span data-i18n="mc.topic"></span>
+      <span id="motion-mc-topic" class="xe" data-i18n="mc.topicEdit"></span>
+    </div>
+    <div class="motion-mc-item">
+      <span data-i18n="mc.totalTime"></span>
+      <span id="motion-mc-total-time" class="xe">0</span>
+      <span data-i18n="timer.sec"></span>
+    </div>
+    <div class="motion-mc-item">
+      <span data-i18n="mc.timeEach"></span>
+      <span id="motion-mc-time-each" class="xe">0</span>
+      <span data-i18n="timer.sec"></span>
+    </div>
+    <div class="motion-mc-item">
+      <span data-i18n="motion.promptBefore"></span>
+      <code id="motion-mc-pass-vote"></code>
+      <span data-i18n="motion.promptAfter"></span>
+    </div>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-    <a href="#" class="btn btn-info" id="submit-init">Initialize Session</a>
+    <button class="btn btn-warning" id="motion-mc-fail" data-i18n="btn.fail"></button>
+    <button class="btn btn-success" id="motion-mc-pass" data-i18n="btn.pass"></a>
   </div>
 </div> <!-- /modal -->
-    </script>
+
+
     <template id="tpl-init-mc" hidden>
 <div class="motion-title" data-i18n="mc.initTitle"></div>
 <form class="form-horizontal">
