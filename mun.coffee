@@ -50,10 +50,8 @@ jQuery ->
     min = '0' + min  if min < 10
     t.getHours() + ":" + min
 
-  newModal = ->
-    $theModal = $($("#tpl-init-sl").html().replace("\n", ""))
-    $theModal.appendTo($("body")).attr("id", "modal-ha").modal "show"
-
+  uid = -> new Date().getTime() % 1000000
+  tpl = (id) -> $ $(id).html().replace("\n", "")
   tlog = (s) -> timelineView.add $.t "log.#{s}"
 
   class SpeakersList extends Backbone.Model
@@ -306,15 +304,17 @@ jQuery ->
   class ControlView extends Backbone.View
     el: $ "#control-wrapper"
     initialize: ->
-      @mcModal = new MotionMCView()
-      @umcModal = new MotionUMCView()
-      @changeGslModal = new MotionChangeGSLTimeView()
+      # @mcModal = new MotionMCView()
+      # @changeGslModal = new MotionChangeGSLTimeView()
       log '$ ControlView initialized.', DEBUG
     events:
       "click #btn-toggle-fullscreen": "toggleFullscreen"
       "click #btn-pause"            : "pauseSession"
       "click #btn-roll-call"        : "initRollCall"
       "click #btn-gsl"              : "initGeneralSL"
+      "click #btn-motion-mc"        : "motionMC"
+      "click #btn-motion-umc"       : "motionUMC"
+      "click #btn-motion-gsl-time"  : "motionGSLTime"
       "change #input-xml-log"       : "readXML"
     toggleFullscreen: ->
       if screenfull.enabled
@@ -328,6 +328,33 @@ jQuery ->
     initGeneralSL: ->
       @gsl = new SpeakersList()
       @gslView = new GSLView(model: @gsl)
+    motion: (opt) ->
+      $m = tpl '#tpl-motion'
+      mid = 'modal-' + uid()
+      $m.appendTo($('body')).attr 'id', mid
+      $("#motion-heading").html opt.title
+      $("#motion-body").prepend tpl opt.elem
+      
+      $m.i18n()
+      $('.xe').editable
+        mode: 'inline'
+      $m.modal 'show'
+      mid
+    motionMC: ->
+      mcModal = new MotionMCView
+        el: @motion
+          title: $.t 'motion.mc'
+          elem: '#tpl-motion-mc'
+    motionUMC: ->
+      umcModal = new MotionUMCView
+        el: @motion
+          title: $.t 'motion.umc'
+          elem: '#tpl-motion-umc'
+    motionGSLTime: ->
+      gslModal = new MotionChangeGSLTimeView
+        el: @motion
+          title: $.t 'motion.changeGSLTime'
+          elem: '#tpl-motion-change-gsl-time'
     readXML: (e) ->
       file = e.target.files[0]
       reader = new FileReader()
@@ -339,20 +366,21 @@ jQuery ->
 
   class MotionBase extends Backbone.View
     events:
-      "shown": "render"
       "click .motion-pass": "pass"
       "click .motion-fail": "fail"
     passVote: 'm1'
+    name: 'MotionBase'
+    initialize: ->
+      @render()
     render: ->
       $(".motion-mc-pass-vote").html Master.get('sessionStats')[@passVote].value
+      log "$ #{@name} rendered.", DEBUG
     fail: ->
       info $.t('motion.failBefore') + $.t('motion.mc') + $.t('motion.failAfter')
       @$el.modal 'hide'
 
   class MotionMCView extends MotionBase
-    el: $ "#modal-motion-mc"
-    initialize: ->
-      log '$ MotionMCView initialized.', DEBUG
+    name: 'MotionMCView'
     pass: ->
       @mcView = new MCView
         model: new SpeakersList,
@@ -363,9 +391,7 @@ jQuery ->
       @$el.modal 'hide'
 
   class MotionUMCView extends MotionBase
-    el: $ "#modal-motion-umc"
-    initialize: ->
-      log '$ MotionUMCView initialized.', DEBUG
+    name: 'MotionUMCView'
     pass: ->
       @umcView = new UMCView
         time: $("#motion-umc-time").html()
@@ -373,9 +399,7 @@ jQuery ->
       @$el.modal 'hide'
 
   class MotionChangeGSLTimeView extends MotionBase
-    el: $ "#modal-motion-change-gsl-time"
-    initialize: ->
-      log '$ MotionChangeGSLTimeView initialized.', DEBUG
+    name: 'MotionChangeGSLTimeView'
     render: ->
       super()
       if not controlView.gsl?
