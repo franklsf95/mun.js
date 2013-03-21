@@ -173,7 +173,7 @@ jQuery ->
       timerView.setTime ops.time
       @render()
     render: ->
-      h =  '<div class="mc-title">#{@name}</div>'
+      h =  "<div class=\"mc-title\">#{@name}</div>"
       h += '<button class="btn btn-info" id="btn-exit-umc">' + $.t('mc.close') + '</button>'
       @$el.html h
 
@@ -306,6 +306,7 @@ jQuery ->
     el: $ "#control-wrapper"
     initialize: ->
       @mcModal = new MotionMCView()
+      @umcModal = new MotionUMCView()
       log '$ ControlView initialized.', DEBUG
     events:
       "click #btn-toggle-fullscreen": "toggleFullscreen"
@@ -313,8 +314,6 @@ jQuery ->
       "click #btn-roll-call"        : "initRollCall"
       "click #btn-gsl"              : "initGeneralSL"
       "click #btn-motion-gsl-time"  : "motionGSLTime"
-      # "click #btn-motion-mc"        : "motionMC"
-      "click #btn-motion-umc"       : "motionUMC"
       "change #input-xml-log"       : "readXML"
     toggleFullscreen: ->
       if screenfull.enabled
@@ -328,11 +327,6 @@ jQuery ->
     initGeneralSL: ->
       @gsl = new SpeakersList()
       @gslView = new GSLView(model: @gsl)
-    motionUMC: ->
-      _mv = @motionVote
-      bootbox.prompt $.t('umc.promptTime'), (t) ->
-        @motionVote $.t('motion.umc'), 'm1', ->
-          @umcView = new UMCView(time: t)
     motionGSLTime: ->
       if not @gsl?
         error $.t 'error.noGSL'
@@ -351,16 +345,22 @@ jQuery ->
       )(file)
       reader.readAsText file, 'UTF-8'
 
-  class MotionMCView extends Backbone.View
-    el: $ "#modal-motion-mc"
+  class MotionBase extends Backbone.View
     events:
       "show": "render"
-      "click #motion-mc-pass": "pass"
-      "click #motion-mc-fail": "fail"
+      "click .motion-pass": "pass"
+      "click .motion-fail": "fail"
+    passVote: 'm1'
+    render: ->
+      $(".motion-mc-pass-vote").html Master.get('sessionStats')[@passVote].value
+    fail: ->
+      info $.t('motion.failBefore') + $.t('motion.mc') + $.t('motion.failAfter')
+      @$el.modal 'hide'
+
+  class MotionMCView extends MotionBase
+    el: $ "#modal-motion-mc"
     initialize: ->
       log '$ MotionMCView initialized.', DEBUG
-    render: ->
-      $("#motion-mc-pass-vote").html Master.get('sessionStats').m1.value
     pass: ->
       @mcView = new MCView
         model: new SpeakersList,
@@ -369,8 +369,15 @@ jQuery ->
         time_each : $("#motion-mc-each-time").html()
       success $.t('motion.passBefore') + $.t('motion.mc') + $.t('motion.passAfter')
       @$el.modal 'hide'
-    fail: ->
-      info $.t('motion.failBefore') + $.t('motion.mc') + $.t('motion.failAfter')
+
+  class MotionUMCView extends MotionBase
+    el: $ "#modal-motion-umc"
+    initialize: ->
+      log '$ MotionUMCView initialized.', DEBUG
+    pass: ->
+      @umcView = new UMCView
+        time: $("#motion-umc-time").html()
+      success $.t('motion.passBefore') + $.t('motion.umc') + $.t('motion.passAfter')
       @$el.modal 'hide'
 
   class StatsView extends Backbone.View

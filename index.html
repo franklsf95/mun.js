@@ -88,7 +88,7 @@
           <button class="btn btn-primary dropdown-toggle" id="btn-motion" data-toggle="dropdown" disabled>Motion <span class="caret"></span></button>
           <ul class="dropdown-menu">
             <li><a href="#" id="btn-motion-mc" data-toggle="modal" data-target="#modal-motion-mc">Moderated Caucus</a></li>
-            <li><a href="#" id="btn-motion-umc">Un-moderated Caucus</a></li>
+            <li><a href="#" id="btn-motion-umc" data-toggle="modal" data-target="#modal-motion-umc">Un-moderated Caucus</a></li>
             <li class="divider"></li>
             <li><a href="#" id="btn-motion-gsl-time">Change General Speech Time</a></li>
           </ul>
@@ -254,45 +254,38 @@ Japan</textarea>
     </div>
     <div class="motion-mc-item">
       <span data-i18n="motion.promptBefore"></span>
-      <code id="motion-mc-pass-vote"></code>
+      <code class="motion-mc-pass-vote"></code>
       <span data-i18n="motion.promptAfter"></span>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-warning" id="motion-mc-fail" data-i18n="btn.fail"></button>
-    <button class="btn btn-success" id="motion-mc-pass" data-i18n="btn.pass"></a>
+    <button class="btn btn-warning motion-fail" data-i18n="btn.fail"></button>
+    <button class="btn btn-success motion-pass" data-i18n="btn.pass"></button>
   </div>
-</div> <!-- /modal -->
+</div> <!-- /modal-mc -->
 
-
-    <template id="tpl-init-mc" hidden>
-<div class="motion-title" data-i18n="mc.initTitle"></div>
-<form class="form-horizontal">
-<div class="control-group">
-  <label for="init-mc-topic" class="control-label" data-i18n="mc.topic"></label>
-  <div class="controls">
-    <input type="text" id="init-mc-topic" class="span4">
+<div class="modal hide fade" id="modal-motion-umc">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h2 data-i18n="motion.umc"></h2>
   </div>
-</div>
-<div class="control-group">
-  <label for="init-mc-total-time" class="control-label" data-i18n="mc.totalTime"></label>
-  <div class="controls">
-    <div class="input-append">
-        <input type="text" id="init-mc-total-time">
-        <span class="add-on">&nbsp;sec</span>
+  <div class="modal-body">
+    <div class="motion-mc-item">
+      <span data-i18n="mc.totalTime"></span>
+      <span id="motion-umc-time" class="xe">0</span>
+      <span data-i18n="timer.sec"></span>
+    </div>
+    <div class="motion-mc-item">
+      <span data-i18n="motion.promptBefore"></span>
+      <code class="motion-mc-pass-vote"></code>
+      <span data-i18n="motion.promptAfter"></span>
     </div>
   </div>
-</div>
-<div class="control-group">
-  <label for="init-mc-each-time" class="control-label" data-i18n="mc.timeEach"></label>
-  <div class="controls">
-    <div class="input-append">
-        <input type="text" id="init-mc-each-time">
-        <span class="add-on">&nbsp;sec</span>
-    </div>
+  <div class="modal-footer">
+    <button class="btn btn-warning motion-fail" data-i18n="btn.fail"></button>
+    <button class="btn btn-success motion-pass" data-i18n="btn.pass"></button>
   </div>
-</div>
-</form>
-    </template>
+</div> <!-- /modal-umc -->
+
   </body>
 </html>
