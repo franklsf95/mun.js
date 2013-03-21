@@ -35,7 +35,7 @@
     <div class="overflow" id="welcome-container">
       <div id="welcome-title">单击此处编辑会议名称</div>
       <div id="welcome-message"></div>
-      <button class="btn btn-primary" id="btn-welcome-hide" data-i18n="btn.enter-session"></button>
+      <button class="btn btn-primary" id="btn-welcome-hide" data-i18n="btn.enterSession"></button>
     </div>
 
     <div class="container" id="main-container">
@@ -81,16 +81,16 @@
 
       <div class="wrapper" id="control-wrapper">
         <div class="wrapper-name" data-i18n="ui.controls"></div>
-        <button class="btn" id="btn-init-session" data-toggle="modal" data-target="#modal-init">Initialize (⌥I)</button>
-        <button class="btn" id="btn-roll-call" disabled>Roll Call</button>
-        <button class="btn" id="btn-gsl" disabled>General Speaker's List</button>
+        <button class="btn" id="btn-init-session" data-toggle="modal" data-target="#modal-init" data-i18n="control.init"></button>
+        <button class="btn" id="btn-roll-call" data-i18n="control.rollCall" disabled></button>
+        <button class="btn" id="btn-gsl" data-i18n="control.gsl" disabled></button>
         <div class="btn-group dropup">
-          <button class="btn btn-primary dropdown-toggle" id="btn-motion" data-toggle="dropdown" disabled>Motion <span class="caret"></span></button>
+          <button class="btn btn-primary dropdown-toggle" id="btn-motion" data-toggle="dropdown" disabled><span data-i18n="control.motion"></span>&nbsp;<span class="caret"></span></button>
           <ul class="dropdown-menu">
-            <li><a href="#" id="btn-motion-mc" data-toggle="modal" data-target="#modal-motion-mc">Moderated Caucus</a></li>
-            <li><a href="#" id="btn-motion-umc" data-toggle="modal" data-target="#modal-motion-umc">Un-moderated Caucus</a></li>
+            <li><a href="#" id="btn-motion-mc" data-toggle="modal" data-target="#modal-motion-mc" data-i18n="motion.mc"></a></li>
+            <li><a href="#" id="btn-motion-umc" data-toggle="modal" data-target="#modal-motion-umc" data-i18n="motion.umc"></a></li>
             <li class="divider"></li>
-            <li><a href="#" id="btn-motion-gsl-time">Change General Speech Time</a></li>
+            <li><a href="#" id="btn-motion-gsl-time" data-toggle="modal" data-target="#modal-motion-change-gsl-time" data-i18n="motion.changeGSLTime"></a></li>
           </ul>
         </div>
         <button class="btn btn-primary" id="btn-toggle-fullscreen">Fullscreen Mode (⇧⌘F)</button>
@@ -100,6 +100,21 @@
         <output id="xml-content"></output>
       </div> <!-- /control-wrapper -->
     </div> <!-- /container -->
+
+    <script src="js/jquery.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/backbone.js"></script>
+    <script src="js/i18next.js"></script>
+
+    <script src="js/jquery.timer.js"></script>
+    <script src="js/backbone.keys.js"></script>
+    <script src="js/screenfull.js"></script>
+
+    <script src="js/bootstrap.js"></script>
+    <script src="js/bootstrap-editable.js"></script>
+    <script src="js/bootbox.js"></script>
+
+    <script src="mun.js"></script>
 
 <div class="modal hide fade" id="modal-settings">
   <div class="modal-header">
@@ -215,24 +230,9 @@ Japan</textarea>
     <a href="#" class="btn" data-dismiss="modal" data-i18n="btn.cancel"></a>
     <a href="#" class="btn btn-info" id="submit-init" data-i18n="btn.init"></a>
   </div>
-</div> <!-- /modal -->
+</div> <!-- /modal-init -->
 
-    <script src="js/jquery.js"></script>
-    <script src="js/underscore.js"></script>
-    <script src="js/backbone.js"></script>
-    <script src="js/i18next.js"></script>
-
-    <script src="js/jquery.timer.js"></script>
-    <script src="js/backbone.keys.js"></script>
-    <script src="js/screenfull.js"></script>
-
-    <script src="js/bootstrap.js"></script>
-    <script src="js/bootstrap-editable.js"></script>
-    <script src="js/bootbox.js"></script>
-
-    <script src="mun.js"></script>
-
-<div class="modal hide fade" id="modal-motion-mc">
+<div class="modal hide fade modal-motion" id="modal-motion-mc">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h2 data-i18n="motion.mc"></h2>
@@ -264,7 +264,7 @@ Japan</textarea>
   </div>
 </div> <!-- /modal-mc -->
 
-<div class="modal hide fade" id="modal-motion-umc">
+<div class="modal hide fade modal-motion" id="modal-motion-umc">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h2 data-i18n="motion.umc"></h2>
@@ -273,6 +273,29 @@ Japan</textarea>
     <div class="motion-mc-item">
       <span data-i18n="mc.totalTime"></span>
       <span id="motion-umc-time" class="xe">0</span>
+      <span data-i18n="timer.sec"></span>
+    </div>
+    <div class="motion-mc-item">
+      <span data-i18n="motion.promptBefore"></span>
+      <code class="motion-mc-pass-vote"></code>
+      <span data-i18n="motion.promptAfter"></span>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-warning motion-fail" data-i18n="btn.fail"></button>
+    <button class="btn btn-success motion-pass" data-i18n="btn.pass"></button>
+  </div>
+</div> <!-- /modal-umc -->
+
+<div class="modal hide fade modal-motion" id="modal-motion-change-gsl-time">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h2 data-i18n="motion.changeGSLTime"></h2>
+  </div>
+  <div class="modal-body">
+    <div class="motion-mc-item">
+      <span data-i18n="changeGSLTime.promptTime"></span>
+      <span id="motion-gsl-time" class="xe">0</span>
       <span data-i18n="timer.sec"></span>
     </div>
     <div class="motion-mc-item">

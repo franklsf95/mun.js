@@ -3,7 +3,7 @@
         "cancel": "取消",
         "close": "关闭",
         "continue": "继续",
-        "enter-session": "进入会议界面",
+        "enterSession": "进入会议界面",
         "fail": "失败",
         "init": "初始化 (Ctrl+Enter)",
         "ok": "好",
@@ -13,9 +13,15 @@
         "save": "保存设置",
         "start": "启动"
     },
-    "changeGSTime": {
-        "promptTime": "请输入主发言时长（秒）：",
+    "changeGSLTime": {
+        "promptTime": "新的主发言时长：",
         "success": "主发言名单时长已调整为 __t__ 秒"
+    },
+    "control": {
+        "gsl": "主发言名单",
+        "init": "初始化",
+        "motion": "动议",
+        "rollCall": "点名"
     },
     "error": {
         "initSessionFirst": "请先统计会议出席人数！",
@@ -63,7 +69,7 @@
         "totalTime": "总时长："
     },
     "motion": {
-        "changeGSTime": "动议修改主发言名单时长",
+        "changeGSLTime": "动议修改主发言名单时长",
         "failBefore": "",
         "failAfter": "失败。",
         "mc": "动议有主持核心磋商",
@@ -112,9 +118,6 @@
         "settings": "设置",
         "timeline": "时间线",
         "timer": "计时器"
-    },
-    "umc": {
-        "promptTime": "请输入自由磋商时长（秒）："
     },
     "views": {
         "gsl-view": "主发言名单",

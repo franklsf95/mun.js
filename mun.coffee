@@ -258,6 +258,7 @@ jQuery ->
           clist
       appView.enable 'btn-roll-call'
       log 'Session successfully initialized!', PRODUCT
+
       timelineView.addTitle $.t 'log.sessionid', id: Master.get('sessionInfo').sessionid
       tlog 'initComplete'
       @$el.modal 'hide'
@@ -307,13 +308,13 @@ jQuery ->
     initialize: ->
       @mcModal = new MotionMCView()
       @umcModal = new MotionUMCView()
+      @changeGslModal = new MotionChangeGSLTimeView()
       log '$ ControlView initialized.', DEBUG
     events:
       "click #btn-toggle-fullscreen": "toggleFullscreen"
       "click #btn-pause"            : "pauseSession"
       "click #btn-roll-call"        : "initRollCall"
       "click #btn-gsl"              : "initGeneralSL"
-      "click #btn-motion-gsl-time"  : "motionGSLTime"
       "change #input-xml-log"       : "readXML"
     toggleFullscreen: ->
       if screenfull.enabled
@@ -327,15 +328,6 @@ jQuery ->
     initGeneralSL: ->
       @gsl = new SpeakersList()
       @gslView = new GSLView(model: @gsl)
-    motionGSLTime: ->
-      if not @gsl?
-        error $.t 'error.noGSL'
-        return
-      _gsl = @gsl
-      @motionVote $.t('motion.changeGSTime'), 'm1', ->
-        bootbox.prompt $.t('changeGSTime.promptTime'), (t) ->
-          _gsl.set 'time': t
-          success $.t('changeGSTime.success', t: t)
     readXML: (e) ->
       file = e.target.files[0]
       reader = new FileReader()
@@ -347,7 +339,7 @@ jQuery ->
 
   class MotionBase extends Backbone.View
     events:
-      "show": "render"
+      "shown": "render"
       "click .motion-pass": "pass"
       "click .motion-fail": "fail"
     passVote: 'm1'
@@ -378,6 +370,22 @@ jQuery ->
       @umcView = new UMCView
         time: $("#motion-umc-time").html()
       success $.t('motion.passBefore') + $.t('motion.umc') + $.t('motion.passAfter')
+      @$el.modal 'hide'
+
+  class MotionChangeGSLTimeView extends MotionBase
+    el: $ "#modal-motion-change-gsl-time"
+    initialize: ->
+      log '$ MotionChangeGSLTimeView initialized.', DEBUG
+    render: ->
+      super()
+      if not controlView.gsl?
+        @$el.modal 'hide'
+        error $.t 'error.noGSL'
+        return
+    pass: ->
+      t = $("#motion-gsl-time").html()
+      controlView.gsl.set 'time': t
+      success $.t('changeGSLTime.success', t: t)
       @$el.modal 'hide'
 
   class StatsView extends Backbone.View
