@@ -60,7 +60,6 @@ jQuery ->
       current: -1
       time: 120
     initialize: (arr) ->
-      log '@ Object SpeakersList created.', DEBUG
       @set 'list', arr  if arr?
     push: (s) ->
       if s?
@@ -78,7 +77,6 @@ jQuery ->
       @name = $.t "views.#{c}"
       @cls  = c
       Master.register @, @name, @cls
-      log "$ #{@name} initialized.", DEBUG
     terminate: ->
       Master.unregister @cls
       @undelegateEvents()
@@ -143,14 +141,14 @@ jQuery ->
     initialize: ->
       super 'gsl-view'
       @listenTo @model, "change:time", @renderTimer
-      log '\t$ GSLView initialized.', DEBUG
 
   class MCView extends BaseSLView
     events: ->
       _.extend {}, super, "click #btn-exit-mc": 'terminate'
-    initialize: (ops)->
-      @params = ops  # topic, time_tot, time_each
+    initialize: (opt) ->
+      @params = opt  # topic, time_tot, time_each
       super 'mc-view'
+      appView.disable 'btn-motion'
     render: ->
       @$el.html "<div class=\"mc-title\">#{$.t('mc.topic')}#{@params.topic}</div><hr>"
       @renderCurrent()
@@ -161,19 +159,26 @@ jQuery ->
       @
     renderTimer: ->
       timerView.setTime @params.time_each, @params.time_tot
+    terminate: ->
+      super()
+      appView.enable 'btn-motion'
 
   class UMCView extends BaseView
     el: $ "#main-activity"
     events:
       "click #btn-exit-umc": "terminate"
-    initialize: (ops) ->
+    initialize: (opt) ->
       super 'umc-view'
-      timerView.setTime ops.time
+      appView.disable 'btn-motion'
+      timerView.setTime opt.time
       @render()
     render: ->
       h =  "<div class=\"mc-title\">#{@name}</div>"
       h += '<button class="btn btn-info" id="btn-exit-umc">' + $.t('mc.close') + '</button>'
       @$el.html h
+    terminate: ->
+      super()
+      appView.enable 'btn-motion'
 
   class RollCallView extends BaseView
     el: $ "#main-activity"
@@ -225,11 +230,9 @@ jQuery ->
       "click #submit-global-settings": "saveGlobalSettings"
     initialize: ->
       @listenTo Master, 'change:variables', @render
-      log '$ SettingsModalView initialized.', DEBUG
     render: ->
       vars = Master.get 'variables'
       $("#input-" + i).val vars[i]   for i of vars
-      log '> SettingsModalView refreshed.'
       @
     saveGlobalSettings: ->
       vars = {}
@@ -241,8 +244,6 @@ jQuery ->
     el: $ "#modal-init"
     events:
       "click #submit-init": "initSession"
-    initialize: ->
-      log '$ InitModalView initialized.', DEBUG
     initSession: ->
       clist = $("#init-country-list").val().split '\n'
       clist = _(clist).filter( (v) -> v != '' )
@@ -274,7 +275,6 @@ jQuery ->
     initialize: ->
       @$timers.timer()
       @setStart()
-      log '$ TimerView initialized.', DEBUG
     setStart: ->
       $("#btn-timer-toggle").html $.t 'btn.start'
     setTime: (t, tt) ->
@@ -303,10 +303,6 @@ jQuery ->
 
   class ControlView extends Backbone.View
     el: $ "#control-wrapper"
-    initialize: ->
-      # @mcModal = new MotionMCView()
-      # @changeGslModal = new MotionChangeGSLTimeView()
-      log '$ ControlView initialized.', DEBUG
     events:
       "click #btn-toggle-fullscreen": "toggleFullscreen"
       "click #btn-pause"            : "pauseSession"
@@ -339,7 +335,7 @@ jQuery ->
       $('.xe').editable
         mode: 'inline'
       $m.modal 'show'
-      mid
+      $m
     motionMC: ->
       mcModal = new MotionMCView
         el: @motion
@@ -416,7 +412,6 @@ jQuery ->
     el: $ "#dl-session-stats"
     initialize: ->
       @listenTo Master, 'change:sessionStats', @render
-      log '$ StatsView initialized.', DEBUG
     render: ->
       @$el.html ''
       arr = Master.get 'sessionStats'
@@ -431,16 +426,11 @@ jQuery ->
       @render()
     render: ->
       @$el.html $.t 'idle.msg'
-      log 'IdleView rendered', DEBUG
 
   class Item extends Backbone.Model
-    initialize: ->
-      log '@ Item created.', DEBUG
   class ItemSL extends Item
   class Timeline extends Backbone.Collection
     model: Item
-    initialize: ->
-      log '% Timeline (Item collection) created.', DEBUG
 
   class TimelineView extends Backbone.View
     el: $ "#timeline"
@@ -450,8 +440,6 @@ jQuery ->
       @$el.append '<li><a href="#">' + now() + ' ' + s + '</a></li>\n'
     addTitle: (s) ->
       @$el.append '<li class="nav-header">' + s + '</li>\n'
-    render: ->
-      log '$ TimelineView rendered', DEBUG
 
   class WelcomeView extends Backbone.View
     el: $ "#welcome-container"
@@ -486,7 +474,6 @@ jQuery ->
         mcDefaultTimeEach: 60   # not-used yet
     initialize: ->
       @on 'change:presentList', @calculate
-      log '@ Object MasterControl created.', DEBUG
     register: (v, n, c) ->
       old = @get('ongoing')
       if not (old is null)
@@ -544,7 +531,6 @@ jQuery ->
       @listenTo Master, 'change:variables', @renderVars
       @listenTo Master, 'change:sessionInfo', @renderTitle
       @render()
-      log '$ AppView initialized.', DEBUG
       # start self-inspection
       if not (window.File && window.FileReader && window.FileList && window.Blob)
         warn 'XML File Processing Function not available.'
@@ -562,7 +548,7 @@ jQuery ->
     renderVars: ->
       vars = Master.get('variables')
       $("#global-prompt").html vars.globalPrompt
-      log "> Global variables applied."
+      log "> Global variables applied.", DEBUG
     enable: (id) ->
       $('#' + id).removeAttr 'disabled'
       log id + ' enabled', DEBUG
