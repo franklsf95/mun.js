@@ -3,13 +3,14 @@
         "cancel": "取消",
         "close": "关闭",
         "continue": "继续",
-        "enterSession": "进入会议界面",
+        "enterSession": "开始会议",
         "fail": "失败",
         "init": "初始化 (Ctrl+Enter)",
         "ok": "好",
         "pass": "通过",
         "pause": "暂停",
         "reset": "重置",
+        "resumeSession": "返回会议",
         "save": "保存设置",
         "start": "启动"
     },
@@ -52,7 +53,8 @@
         "topic": "议题"
     },
     "log": {
-        "initComplete": "会议已开启。",
+        "initCompleted": "会议已开启。",
+        "rollCallStarted": "开始点名。",
         "sessionid": "第 __id__ 会期",
         "sessionPaused": "会议已暂停",
         "sessionResumed": "会议已恢复"
@@ -80,7 +82,7 @@
         "promptAfter": "票赞成方可通过。"
     },
     "prompt": {
-        "defaultGlobal": "欢迎来到2013年北京市高中生模拟联合国暑期研讨会",
+        "defaultGlobal": "欢迎使用 Coffee MUN！",
         "error": "错误：",
         "exhausted": "已经结束。",
         "notice": "提示：",
@@ -126,7 +128,14 @@
         "umc-view": "自由磋商"
     },
     "welcome": {
+        "chair": "主 席",
+        "director": "学术指导",
+        "paused": "会议已暂停。",
+        "rapporteur": "主席助理",
+        "tip": "单击界面上的文字可以直接修改显示内容哦~",
         "welcome": "欢迎！",
-        "paused": "会议已暂停。"
+        "xe1": "（单击...",
+        "xe2": "文字...",
+        "xe3": "修改）"
     }
 }

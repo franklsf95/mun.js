@@ -52,7 +52,11 @@ jQuery ->
 
   uid = -> new Date().getTime() % 1000000
   tpl = (id) -> $ $(id).html().replace("\n", "")
-  tlog = (s) -> timelineView.add $.t "log.#{s}"
+  tlog = (s) -> 
+    timeline.add
+      time: now()
+      code: s
+      msg:  $.t "log.#{s}"
 
   class SpeakersList extends Backbone.Model
     defaults: ->  # fix bug that list[] is declared static in prototype
@@ -194,6 +198,7 @@ jQuery ->
       @countryList = Master.get 'countryList'
       Master.set 'presentList', []
       appView.disable 'btn-roll-call'
+      tlog 'rollCallStarted'
       super 'roll-call-view'
     render: ->
       if @current == @countryList.length
@@ -259,7 +264,7 @@ jQuery ->
       log 'Session successfully initialized!', PRODUCT
 
       timelineView.addTitle $.t 'log.sessionid', id: Master.get('sessionInfo').sessionid
-      tlog 'initComplete'
+      tlog 'initCompleted'
       @$el.modal 'hide'
 
   class TimerView extends Backbone.View
@@ -317,7 +322,7 @@ jQuery ->
         screenfull.toggle()
         $("#btn-toggle-fullscreen").html (if screenfull.isFullscreen then 'Exit Fullscreen' else 'Fullscreen Mode')
     pauseSession: ->
-      welcomeView.msg($.t('welcome.paused')).render()
+      welcomeView.msg($.t 'welcome.paused').renderBtn($.t 'btn.resumeSession').render()
       log $.t('log.sessionPaused'), PRODUCT
     initRollCall: ->
       @rollCallView = new RollCallView()
@@ -428,6 +433,14 @@ jQuery ->
       @$el.html $.t 'idle.msg'
 
   class Item extends Backbone.Model
+    defaults: ->
+      code: ''
+      msg:  ''
+      time: ''
+      type: 'session'
+    toString: ->
+      @get('time') + ' ' + @get('msg')
+
   class ItemSL extends Item
   class Timeline extends Backbone.Collection
     model: Item
@@ -435,28 +448,33 @@ jQuery ->
   class TimelineView extends Backbone.View
     el: $ "#timeline"
     initialize: ->
+      @listenTo timeline, 'add', @add
       @render()
-    add: (s) ->
-      @$el.append '<li><a href="#">' + now() + ' ' + s + '</a></li>\n'
+    add: (item) ->
+      @$el.append '<li><a href="#">' + item + '</a></li>\n'
     addTitle: (s) ->
       @$el.append '<li class="nav-header">' + s + '</li>\n'
 
   class WelcomeView extends Backbone.View
     el: $ "#welcome-container"
-    message: "Hello"
+    message: -> $.t 'prompt.defaultGlobal'
     events:
       "click #btn-welcome-hide": "unrender"
     initialize: ->
       @render()
     render: ->
       @$el.fadeIn 1000
-      $("#welcome-message").html @message
+      $("#welcome-title").html @message
       log 'WelcomeView entered', DEBUG
     unrender: ->
       @$el.fadeOut 1000
       log 'WelcomeView exited', DEBUG
     msg: (s) ->
       @message = s
+      @
+    renderBtn: (s) ->
+      log s
+      $('#btn-welcome-hide').html s
       @
 
   class MasterControl extends Backbone.Model
@@ -520,10 +538,12 @@ jQuery ->
       @get('presentList').push c
       @trigger 'change:presentList'
     logStack: (isUnreg, cls) ->
-      log ">>\tThread #{cls} " + (if isUnreg then 'popped out' else 'pushed in')
-      log ">>\tThread Stack:"
-      log "\t\t#{o.name}\t#{o.cls}", DEBUG  for o in @get('threadStack')
-      return
+      log ">> Thread #{cls} " + (if isUnreg then 'popped out' else 'pushed in')
+      if @get('threadStack').length == 0
+        log '>> Thread Stack is empty.'
+        return
+      log '>> Thread Stack:'
+      log "\t\t#{o.name}\t#{o.cls}", DEBUG  for o in @get 'threadStack'
 
   class AppView extends Backbone.View
     initialize: ->
@@ -568,14 +588,14 @@ jQuery ->
   Master = new MasterControl()
   idleView = new IdleView()
   welcomeView = new WelcomeView()
-  welcomeView.unrender()
 
+  timeline = new Timeline()
   appView = new AppView()
   timelineView = new TimelineView()
+
   timerView = new TimerView()
   statsView = new StatsView()
   controlView = new ControlView()
-
   initModal = new InitModalView()
   settModal = new SettingsModalView()
 

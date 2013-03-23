@@ -33,9 +33,25 @@
     </nav>
 
     <div class="overflow" id="welcome-container">
-      <div id="welcome-title">单击此处编辑会议名称</div>
-      <div id="welcome-message"></div>
-      <button class="btn btn-primary" id="btn-welcome-hide" data-i18n="btn.enterSession"></button>
+      <div id="welcome-tip" class="alert alert-info">
+        <a type="button" class="close" data-dismiss="alert">&times;</a>
+        <span data-i18n="welcome.tip"></span>
+      </div>
+      <div id="welcome-title" class="xe" data-mode="popup" data-placement="bottom"></div>
+      <div id="welcome-img"></div>
+      <div class="welcome-box">
+        <div class="position xe" data-i18n="welcome.rapporteur"></div>
+        <div class="name xe" data-type="textarea" data-i18n="welcome.xe1"></div>
+      </div>
+      <div class="welcome-box">
+        <div class="position xe" data-i18n="welcome.chair"></div>
+        <div class="name xe" data-type="textarea" data-i18n="welcome.xe2"></div>
+      </div>
+      <div class="welcome-box">
+        <div class="position xe" data-i18n="welcome.director"></div>
+        <div class="name xe" data-type="textarea" data-i18n="welcome.xe3"></div>
+      </div>
+      <button class="btn" id="btn-welcome-hide" data-i18n="btn.enterSession"></button>
     </div>
 
     <div class="container" id="main-container">
@@ -81,9 +97,9 @@
 
       <div class="wrapper" id="control-wrapper">
         <div class="wrapper-name" data-i18n="ui.controls"></div>
-        <button class="btn" id="btn-init-session" data-toggle="modal" data-target="#modal-init" data-i18n="control.init"></button>
-        <button class="btn" id="btn-roll-call" data-i18n="control.rollCall" disabled></button>
-        <button class="btn" id="btn-gsl" data-i18n="control.gsl" disabled></button>
+        <button class="btn btn-primary" id="btn-init-session" data-toggle="modal" data-target="#modal-init" data-i18n="control.init"></button>
+        <button class="btn btn-primary" id="btn-roll-call" data-i18n="control.rollCall" disabled></button>
+        <button class="btn btn-primary" id="btn-gsl" data-i18n="control.gsl" disabled></button>
         <div class="btn-group dropup">
           <button class="btn btn-primary dropdown-toggle" id="btn-motion" data-toggle="dropdown" disabled><span data-i18n="control.motion"></span>&nbsp;<span class="caret"></span></button>
           <ul class="dropdown-menu">

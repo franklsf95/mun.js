@@ -30,7 +30,7 @@ class ConsoleLogger
 class Backbone.Debug
   constructor: () ->
     @_options =
-      'log:events': true
+      'log:events': false
       'log:sync': false
       'log:instances': true
       'log:views': false
