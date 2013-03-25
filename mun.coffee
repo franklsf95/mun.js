@@ -335,11 +335,6 @@ jQuery ->
       $m.appendTo($('body')).attr 'id', mid
       $("#motion-heading").html opt.title
       $("#motion-body").prepend tpl opt.elem
-      
-      $m.i18n()
-      $('.xe').editable
-        mode: 'inline'
-      $m.modal 'show'
       $m
     motionMC: ->
       mcModal = new MotionMCView
@@ -370,18 +365,23 @@ jQuery ->
       "click .motion-pass": "pass"
       "click .motion-fail": "fail"
     passVote: 'm1'
-    name: 'MotionBase'
     initialize: ->
       @render()
     render: ->
+      @$el.i18n()
+      @$el.modal 'show'
+      $('.xe').editable
+        mode: 'inline'
       $(".motion-mc-pass-vote").html Master.get('sessionStats')[@passVote].value
-      log "$ #{@name} rendered.", DEBUG
     fail: ->
       info $.t('motion.failBefore') + $.t('motion.mc') + $.t('motion.failAfter')
+      @destroy()
+    destroy: ->
       @$el.modal 'hide'
+      @$el.data('modal', null).remove()
+      $('.modal-backdrop').remove()
 
   class MotionMCView extends MotionBase
-    name: 'MotionMCView'
     pass: ->
       @mcView = new MCView
         model: new SpeakersList,
@@ -389,18 +389,16 @@ jQuery ->
         time_tot  : $("#motion-mc-total-time").html()
         time_each : $("#motion-mc-each-time").html()
       success $.t('motion.passBefore') + $.t('motion.mc') + $.t('motion.passAfter')
-      @$el.modal 'hide'
+      @destroy()
 
   class MotionUMCView extends MotionBase
-    name: 'MotionUMCView'
     pass: ->
       @umcView = new UMCView
         time: $("#motion-umc-time").html()
       success $.t('motion.passBefore') + $.t('motion.umc') + $.t('motion.passAfter')
-      @$el.modal 'hide'
+      @destroy()
 
   class MotionChangeGSLTimeView extends MotionBase
-    name: 'MotionChangeGSLTimeView'
     render: ->
       super()
       if not controlView.gsl?
@@ -411,7 +409,7 @@ jQuery ->
       t = $("#motion-gsl-time").html()
       controlView.gsl.set 'time': t
       success $.t('changeGSLTime.success', t: t)
-      @$el.modal 'hide'
+      @destroy()
 
   class StatsView extends Backbone.View
     el: $ "#dl-session-stats"
@@ -605,5 +603,6 @@ jQuery ->
   Master.trigger('change:variables')
   initModal.initSession()
   controlView.initRollCall()
+  welcomeView.unrender()
 
   return
