@@ -54,6 +54,8 @@
     },
     "log": {
         "initCompleted": "会议已开启。",
+        "motionMC": "__country__动议了一个有主持核心磋商；议题为__topic__。",
+        "motionUMC": "__country__动议了一个自由磋商。",
         "rollCallStarted": "开始点名。",
         "sessionid": "第 __id__ 会期",
         "sessionPaused": "会议已暂停",
@@ -67,19 +69,21 @@
         "initTitle": "有主持核心磋商",
         "timeEach": "发言时长：",
         "topic": "议题：",
-        "topicEdit": "单击文字进行编辑",
+        "topicEdit": "(单击文字进行编辑)",
         "totalTime": "总时长："
     },
     "motion": {
         "changeGSLTime": "动议修改主发言名单时长",
+        "country": "国家：",
+        "countryEdit": "(填写国家)",
         "failBefore": "",
         "failAfter": "失败。",
         "mc": "动议有主持核心磋商",
-        "umc": "动议自由磋商",
         "passBefore": "",
         "passAfter": "通过。",
         "promptBefore": "该动议需要",
-        "promptAfter": "票赞成方可通过。"
+        "promptAfter": "票赞成方可通过。",
+        "umc": "动议自由磋商"
     },
     "prompt": {
         "defaultGlobal": "欢迎使用 Coffee MUN！",

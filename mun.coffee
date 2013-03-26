@@ -52,11 +52,11 @@ jQuery ->
 
   uid = -> new Date().getTime() % 1000000
   tpl = (id) -> $ $(id).html().replace("\n", "")
-  tlog = (s) -> 
+  tlog = (s, context) -> 
     timeline.add
       time: now()
       code: s
-      msg:  $.t "log.#{s}"
+      msg:  $.t "log.#{s}", context
 
   class SpeakersList extends Backbone.Model
     defaults: ->  # fix bug that list[] is declared static in prototype
@@ -334,7 +334,7 @@ jQuery ->
       mid = 'modal-' + uid()
       $m.appendTo($('body')).attr 'id', mid
       $("#motion-heading").html opt.title
-      $("#motion-body").prepend tpl opt.elem
+      $("#add-here").prepend tpl opt.elem
       $m
     motionMC: ->
       mcModal = new MotionMCView
@@ -383,16 +383,24 @@ jQuery ->
 
   class MotionMCView extends MotionBase
     pass: ->
+      c = $("#motion-country").html()
+      t = $("#motion-mc-topic").html()
+      tlog 'motionMC',
+        country: c
+        topic  : t
       @mcView = new MCView
         model: new SpeakersList,
-        topic     : $("#motion-mc-topic").html()
+        topic     : t
         time_tot  : $("#motion-mc-total-time").html()
         time_each : $("#motion-mc-each-time").html()
+      @mcView.model.push c
       success $.t('motion.passBefore') + $.t('motion.mc') + $.t('motion.passAfter')
       @destroy()
 
   class MotionUMCView extends MotionBase
     pass: ->
+      tlog 'motionUMC',
+        country: $("#motion-country").html()
       @umcView = new UMCView
         time: $("#motion-umc-time").html()
       success $.t('motion.passBefore') + $.t('motion.umc') + $.t('motion.passAfter')
