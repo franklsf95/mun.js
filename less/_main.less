@@ -2,6 +2,8 @@
 @import "bootstrap-editable.less";
 // @import "bootstrap.less";
 
+@rollCallBlue: #ebf5ff;
+
 /*----------------------------
    Welcome Module
  -----------------------------*/
@@ -85,13 +87,12 @@
 }
 
 /*----------------------------
-   Common Style
+   Common Style & Grid
  -----------------------------*/
 @slimFont: "Helvetica Neue", "Segoe UI Light";
 
 .wrapper {
   position: relative;
-  margin: 15px 0;
   padding: 40px 12px 10px;
   background-color: #fff;
   height: 500px;
@@ -117,6 +118,10 @@
   position: absolute;
   left: 500px;
   top: 70px;
+}
+
+#stats-wrapper, #control-wrapper {
+  margin-top: 15px;
 }
 
 /*----------------------------
@@ -155,22 +160,43 @@
   }
 }
 
-#navbar-message {
-  line-height: 24px;
-  font-family: "Segoe UI Light";
-  color: #fff;
-
-}
-.navbar-inner {
-  min-height: 30px;
-}
-
 /*----------------------------
    Session Title
  -----------------------------*/
+#navbar a {
+  padding: 15px 0;
+}
+
+#navbar-prompt {
+  cursor: pointer;
+  border: none;
+}
+
+#committee {
+  font-size: @baseFontSize * 1.25;
+  margin-right: 20px;
+}
+
+#header-wrapper {
+  color: #000;
+  height: 60px;
+  width: 940px;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
 #session-title {
   font-size: @baseFontSize * 1.75;
-  margin: 18px 0 8px 0;
+  padding: 18px 0 8px 0;
+  text-overflow: ellipsis;
+}
+
+#session-id {
+  margin-right: 16px;
+  padding: 4px 10px;
+  border: 1px solid #e3e3e3;
+  .border-radius(5px);
 }
 
 /*----------------------------
@@ -272,7 +298,7 @@
    Roll Call View
  -----------------------------*/
 .roll-call-view {
-  background-color: #ebf5ff;
+  background-color: @rollCallBlue;
   .btn {
     width: 100px;
   }
@@ -350,6 +376,12 @@
     font-size: inherit;
     line-height: inherit;
   }
+}
+
+#btn-exit-mc, #btn-exit-umc {
+  font-size: @baseFontSize;
+  height: 36px;
+  width: 160px;
 }
 
 

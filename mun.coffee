@@ -165,6 +165,7 @@ jQuery ->
       timerView.setTime @params.time_each, @params.time_tot
     terminate: ->
       super()
+      tlog 'endMC'
       appView.enable 'btn-motion'
 
   class UMCView extends BaseView
@@ -182,6 +183,7 @@ jQuery ->
       @$el.html h
     terminate: ->
       super()
+      tlog 'endUMC'
       appView.enable 'btn-motion'
 
   class RollCallView extends BaseView
@@ -492,7 +494,6 @@ jQuery ->
       ongoing: null
       threadStack: []
       variables:
-        globalPrompt: -> $.t 'prompt.defaultGlobal'
         autoFadeTime: 3000
         mcDefaultTimeTotal: 300 # not-used yet
         mcDefaultTimeEach: 60   # not-used yet
@@ -567,13 +568,18 @@ jQuery ->
       $("#main-wrapper").removeClass cls
       $("#main-activity").html ''
     renderTitle: ->
-      h = Master.get('sessionInfo')['committee']
-      h += ' (' + Master.get('sessionInfo')['abbr'] +  ') '
-      h += $.t 'log.sessionid', id: Master.get('sessionInfo').sessionid
+      s = Master.get 'sessionInfo'
+      h = '<span id="session-id">'
+      h += $.t 'log.sessionid', id: s.sessionid
+      h += '</span>'
+      h += '<span id="session-topic">'
+      h += s.topic
+      h += '</span>'
       $("#session-title").html h
+      h = s.committee + " (#{s.abbr})"
+      $("#committee").html h
     renderVars: ->
       vars = Master.get('variables')
-      $("#global-prompt").html vars.globalPrompt
       log "> Global variables applied.", DEBUG
     enable: (id) ->
       $('#' + id).removeAttr 'disabled'

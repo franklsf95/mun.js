@@ -53,6 +53,8 @@
         "topic": "议题"
     },
     "log": {
+        "endMC": "有主持核心磋商结束。",
+        "endUMC": "自由磋商结束。",
         "initCompleted": "会议已开启。",
         "motionMC": "__country__动议了一个有主持核心磋商；议题为__topic__。",
         "motionUMC": "__country__动议了一个自由磋商。",

@@ -19,19 +19,6 @@
   </head>
 
   <body>
-    <nav class="navbar navbar-static-top" id="navbar">
-      <div class="navbar-inner">
-        <div class="container">
-          <ul class="nav">
-            <li><a href="#" id="global-prompt"></a></li>
-          </ul>
-          <ul class="nav pull-right">
-            <li><a href="#" data-toggle="modal" data-target="#modal-settings" data-i18n="ui.settings"></a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
     <div class="overflow" id="welcome-container">
       <div id="welcome-tip" class="alert alert-info">
         <a type="button" class="close" data-dismiss="alert">&times;</a>
@@ -53,6 +40,20 @@
       </div>
       <button class="btn" id="btn-welcome-hide" data-i18n="btn.enterSession"></button>
     </div>
+
+    <nav class="navbar navbar-static-top" id="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <ul class="nav">
+            <li><a id="committee"></a></li>
+            <li><a id="navbar-prompt" class="xe" data-i18n="prompt.defaultGlobal"></a></li>
+          </ul>
+          <ul class="nav pull-right">
+            <li><a href="#" data-toggle="modal" data-target="#modal-settings" data-i18n="ui.settings"></a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
     <div class="container" id="main-container">
       <div class="row">
@@ -146,14 +147,7 @@
       </ul>
       <div id="modal-settings-content" class="tab-content">
         <div class="tab-pane active" id="modal-settings-general">
-          <form class="form-horizontal">
-            <div class="control-group">
-              <label for="input-globalPrompt" class="control-label" data-i18n="global.globalPrompt"></label>
-              <div class="controls">
-                <input type="text" id="input-globalPrompt" class="span4">
-              </div>
-            </div>
-          </form>
+          none
         </div><!-- /tab-pane -->
         <div class="tab-pane" id="modal-settings-interface">
           <form class="form-horizontal">
@@ -220,7 +214,7 @@
             <div class="control-group">
               <label for="init-topic" class="control-label" data-i18n="init.topic"></label>
               <div class="controls">
-                <input type="text" id="init-topic" class="span3">
+                <input type="text" id="init-topic" class="span3" value="North Korean Nuclear Issue">
               </div>
             </div>
             <div class="control-group">
