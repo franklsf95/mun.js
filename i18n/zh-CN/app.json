@@ -22,7 +22,8 @@
         "gsl": "主发言名单",
         "init": "初始化",
         "motion": "动议",
-        "rollCall": "点名"
+        "rollCall": "点名",
+        "vote": "投票"
     },
     "error": {
         "initSessionFirst": "请先统计会议出席人数！",
@@ -59,6 +60,7 @@
         "motionMC": "__country__动议了一个有主持核心磋商；议题为__topic__。",
         "motionUMC": "__country__动议了一个自由磋商。",
         "rollCallStarted": "开始点名。",
+        "rollCallCompleted": "点名结束。",
         "sessionid": "第 __id__ 会期",
         "sessionPaused": "会议已暂停",
         "sessionResumed": "会议已恢复"

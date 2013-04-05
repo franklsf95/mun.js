@@ -30,16 +30,16 @@ jQuery ->
   log = (s, lv) -> console.log s #if lv >= THRESHOLD
 
   warn = (s, type, to) ->
-    to ?= "#main-container"
-    con = "<div class=\"alert"
-    con += " alert-" + type  if type
-    con += "\">" + "<button class=\"close\" data-dismiss=\"alert\">&times;</button>"
+    to ?= '#main-container'
+    con = '<div class="alert'
+    con += ' alert-' + type  if type
+    con += '"><button class="close" data-dismiss="alert">&times;</button>'
     con += "<strong>#{$.t('prompt.warning')}</strong>"  unless type
-    con += s + "</div>"
+    con += s + '</div>'
     $(con).prependTo($ to).hide().slideDown()
-    window.setTimeout ( -> $(".alert").alert('close') ), Master.get('variables').autoFadeTime
+    window.setTimeout ( -> $('.alert').alert('close') ), Master.get('variables').autoFadeTime
 
-  notice = (s, type) -> warn s, type, "#main-wrapper"
+  notice = (s, type) -> warn s, type, '#main-wrapper'
   error   = (s) -> notice "<b>#{$.t('prompt.error')}</b>"   + s, 'error'
   success = (s) -> notice "<b>#{$.t('prompt.success')}</b>" + s, 'success'
   info    = (s) -> notice "<b>#{$.t('prompt.notice')}</b>"  + s, 'info'
@@ -48,10 +48,10 @@ jQuery ->
     t = new Date
     min = t.getMinutes()
     min = '0' + min  if min < 10
-    t.getHours() + ":" + min
+    t.getHours() + ':' + min
 
   uid = -> new Date().getTime() % 1000000
-  tpl = (id) -> $ $(id).html().replace("\n", "")
+  tpl = (id) -> $ $(id).html().replace('\n', '')
   tlog = (s, context) -> 
     timeline.add
       time: now()
@@ -77,6 +77,7 @@ jQuery ->
       (@get 'list')[@get 'current']
 
   class BaseView extends Backbone.View
+    el: $ '#main-activity'
     initialize: (c) ->
       @name = $.t "views.#{c}"
       @cls  = c
@@ -87,19 +88,18 @@ jQuery ->
       log "$ #{@name} terminated.", DEBUG
 
   class BaseSLView extends BaseView
-    el: $ "#main-activity"
-    events: ->   # for children to extend
-      "keypress": 'enterKey'
-      "click #btn-gsl-next": 'nextCountry'
+    events: ->
+      'keypress': 'enterKey'
+      'click #btn-gsl-next': 'nextCountry'
     initialize: (c) ->
       super c
-      @listenTo @model, "change:list", @renderList
+      @listenTo @model, 'change:list', @renderList
     render: ->
       @$el.html ''
       @renderCurrent()
       @renderList()
       @renderTimer()
-      $("#sl-add-country").tooltip
+      $('#sl-add-country').tooltip
         trigger: 'focus'
       .typeahead
         source: -> Master.get('presentList')
@@ -119,19 +119,19 @@ jQuery ->
       list = @model.get 'list'
       h  = ''
       h += "<li>#{c}</li>"  for c in list[@model.get('current') + 1 ..]
-      $(".pending-country-list").html h
+      $('.pending-country-list').html h
       @
     renderTimer: ->
       timerView.setTime @model.get 'time'
     enterKey: (e) ->
       if e.keyCode == 13
-        c = $("#sl-add-country").val()
+        c = $('#sl-add-country').val()
         @model.push(c)
-        $("#sl-add-country").val('').focus()
+        $('#sl-add-country').val('').focus()
     nextCountry: ->
       c = @model.next()
       if c?
-        $(".highlight-country").html c
+        $('.highlight-country').html c
         @renderList()
         timerView.reset()
       else
@@ -144,11 +144,11 @@ jQuery ->
   class GSLView extends BaseSLView
     initialize: ->
       super 'gsl-view'
-      @listenTo @model, "change:time", @renderTimer
+      @listenTo @model, 'change:time', @renderTimer
 
   class MCView extends BaseSLView
     events: ->
-      _.extend {}, super, "click #btn-exit-mc": 'terminate'
+      _.extend {}, super, 'click #btn-exit-mc': 'terminate'
     initialize: (opt) ->
       @params = opt  # topic, time_tot, time_each
       super 'mc-view'
@@ -159,7 +159,7 @@ jQuery ->
       @renderList()
       @renderTimer()
       @$el.append '<hr><button class="btn btn-info" id="btn-exit-mc">' + $.t('mc.close') + '</button>'
-      $("#sl-add-country").tooltip(trigger: 'focus').focus()
+      $('#sl-add-country').tooltip(trigger: 'focus').focus()
       @
     renderTimer: ->
       timerView.setTime @params.time_each, @params.time_tot
@@ -169,9 +169,8 @@ jQuery ->
       appView.enable 'btn-motion'
 
   class UMCView extends BaseView
-    el: $ "#main-activity"
     events:
-      "click #btn-exit-umc": "terminate"
+      'click #btn-exit-umc': 'terminate'
     initialize: (opt) ->
       super 'umc-view'
       appView.disable 'btn-motion'
@@ -187,14 +186,12 @@ jQuery ->
       appView.enable 'btn-motion'
 
   class RollCallView extends BaseView
-    el: $ "#main-activity"
     events:
-      "click #btn-roll-call-present": "countryPresent"
-      "click #btn-roll-call-absent":  "countryAbsent"
+      'click #btn-roll-call-present': 'countryPresent'
+      'click #btn-roll-call-absent':  'countryAbsent'
     keys:
-      "p": ->
-        @countryPresent()
-      "a": "countryAbsent"
+      'p': 'countryPresent'
+      'a': 'countryAbsent'
     initialize: ->
       @current = 0
       @countryList = Master.get 'countryList'
@@ -227,39 +224,46 @@ jQuery ->
     terminate: ->
       super()
       success $.t 'prompt.rollCallCompleted'
-      appView.enable 'btn-roll-call'
-      appView.enable 'btn-gsl'
-      appView.enable 'btn-motion'
+      tlog 'rollCallCompleted'
+      appView.enable ['btn-roll-call', 'btn-gsl', 'btn-motion', 'btn-vote']
+
+  class VoteView extends BaseView
+    el: $ 'main-activity'
+    initialize: ->
+      super
+      @render
+    render: ->
+      @$el.html("!!!!!")
 
   class SettingsModalView extends Backbone.View
-    el: $ "#modal-settings"
+    el: $ '#modal-settings'
     events:
-      "click #submit-global-settings": "saveGlobalSettings"
+      'click #submit-global-settings': 'saveGlobalSettings'
     initialize: ->
       @listenTo Master, 'change:variables', @render
     render: ->
       vars = Master.get 'variables'
-      $("#input-" + i).val vars[i]   for i of vars
+      $('#input-' + i).val vars[i]   for i of vars
       @
     saveGlobalSettings: ->
       vars = {}
       for key of Master.get 'variables'
-        vars[key] = $("#input-" + key).val()
+        vars[key] = $('#input-' + key).val()
       Master.set 'variables', vars
 
   class InitModalView extends Backbone.View
-    el: $ "#modal-init"
+    el: $ '#modal-init'
     events:
-      "click #submit-init": "initSession"
+      'click #submit-init': 'initSession'
     initSession: ->
-      clist = $("#init-country-list").val().split '\n'
+      clist = $('#init-country-list').val().split '\n'
       clist = _(clist).filter( (v) -> v != '' )
       Master.set
         'sessionInfo':
-          'committee': $("#init-committee").val()
-          'abbr': $("#init-abbr").val()
-          'topic': $("#init-topic").val()
-          'sessionid': $("#init-sessionid").val()
+          'committee': $('#init-committee').val()
+          'abbr': $('#init-abbr').val()
+          'topic': $('#init-topic').val()
+          'sessionid': $('#init-sessionid').val()
         'countryList':
           clist
       appView.enable 'btn-roll-call'
@@ -270,20 +274,20 @@ jQuery ->
       @$el.modal 'hide'
 
   class TimerView extends Backbone.View
-    $t:  $ "#global-timer"
-    $tt: $ "#global-timer-total"
-    $timers: $ ".timer"
-    el:  $ "#timer-wrapper"
+    $t:  $ '#global-timer'
+    $tt: $ '#global-timer-total'
+    $timers: $ '.timer'
+    el:  $ '#timer-wrapper'
     running: false
     events:
-      "click #btn-timer-toggle": 'toggle'
-      "click #btn-timer-reset" : 'reset'
-      "timeout"                : 'toggle'
+      'click #btn-timer-toggle': 'toggle'
+      'click #btn-timer-reset' : 'reset'
+      'timeout'                : 'toggle'
     initialize: ->
       @$timers.timer()
       @setStart()
     setStart: ->
-      $("#btn-timer-toggle").html $.t 'btn.start'
+      $('#btn-timer-toggle').html $.t 'btn.start'
     setTime: (t, tt) ->
       tt ?= t
       @$t.timer time:t
@@ -292,11 +296,11 @@ jQuery ->
       if @running
         @$timers.timer 'stop'
         @running = false
-        $("#btn-timer-toggle").html  $.t 'btn.continue'
+        $('#btn-timer-toggle').html  $.t 'btn.continue'
       else
         @$timers.timer 'start'
         @running = true
-        $("#btn-timer-toggle").html  $.t 'btn.pause'
+        $('#btn-timer-toggle').html  $.t 'btn.pause'
     reset: ->
       @toggle()  if @running
       @$t.timer 'reset'
@@ -309,20 +313,21 @@ jQuery ->
       log 'Global Timer reset', DEBUG
 
   class ControlView extends Backbone.View
-    el: $ "#control-wrapper"
+    el: $ '#control-wrapper'
     events:
-      "click #btn-toggle-fullscreen": "toggleFullscreen"
-      "click #btn-pause"            : "pauseSession"
-      "click #btn-roll-call"        : "initRollCall"
-      "click #btn-gsl"              : "initGeneralSL"
-      "click #btn-motion-mc"        : "motionMC"
-      "click #btn-motion-umc"       : "motionUMC"
-      "click #btn-motion-gsl-time"  : "motionGSLTime"
-      "change #input-xml-log"       : "readXML"
+      'click #btn-toggle-fullscreen': 'toggleFullscreen'
+      'click #btn-pause'            : 'pauseSession'
+      'click #btn-roll-call'        : 'initRollCall'
+      'click #btn-gsl'              : 'initGeneralSL'
+      'click #btn-motion-mc'        : 'motionMC'
+      'click #btn-motion-umc'       : 'motionUMC'
+      'click #btn-motion-gsl-time'  : 'motionGSLTime'
+      'click #btn-vote'             : 'initVote'
+      'change #input-xml-log'       : 'readXML'
     toggleFullscreen: ->
       if screenfull.enabled
         screenfull.toggle()
-        $("#btn-toggle-fullscreen").html (if screenfull.isFullscreen then 'Exit Fullscreen' else 'Fullscreen Mode')
+        $('#btn-toggle-fullscreen').html (if screenfull.isFullscreen then 'Exit Fullscreen' else 'Fullscreen Mode')
     pauseSession: ->
       welcomeView.msg($.t 'welcome.paused').renderBtn($.t 'btn.resumeSession').render()
       log $.t('log.sessionPaused'), PRODUCT
@@ -335,8 +340,8 @@ jQuery ->
       $m = tpl '#tpl-motion'
       mid = 'modal-' + uid()
       $m.appendTo($('body')).attr 'id', mid
-      $("#motion-heading").html opt.title
-      $("#add-here").prepend tpl opt.elem
+      $('#motion-heading').html opt.title
+      $('#add-here').prepend tpl opt.elem
       $m
     motionMC: ->
       mcModal = new MotionMCView
@@ -353,19 +358,21 @@ jQuery ->
         el: @motion
           title: $.t 'motion.changeGSLTime'
           elem: '#tpl-motion-change-gsl-time'
+    initVote: ->
+      @voteView = new VoteView
     readXML: (e) ->
       file = e.target.files[0]
       reader = new FileReader()
       reader.onloadend = ( (file)->
         (e) ->
-          $("#xml-content").html e.target.result
+          $('#xml-content').html e.target.result
       )(file)
       reader.readAsText file, 'UTF-8'
 
   class MotionBase extends Backbone.View
     events:
-      "click .motion-pass": "pass"
-      "click .motion-fail": "fail"
+      'click .motion-pass': 'pass'
+      'click .motion-fail': 'fail'
     passVote: 'm1'
     initialize: ->
       @render()
@@ -374,7 +381,7 @@ jQuery ->
       @$el.modal 'show'
       $('.xe').editable
         mode: 'inline'
-      $(".motion-mc-pass-vote").html Master.get('sessionStats')[@passVote].value
+      $('.motion-mc-pass-vote').html Master.get('sessionStats')[@passVote].value
     fail: ->
       info $.t('motion.failBefore') + $.t('motion.mc') + $.t('motion.failAfter')
       @destroy()
@@ -385,16 +392,16 @@ jQuery ->
 
   class MotionMCView extends MotionBase
     pass: ->
-      c = $("#motion-country").html()
-      t = $("#motion-mc-topic").html()
+      c = $('#motion-country').html()
+      t = $('#motion-mc-topic').html()
       tlog 'motionMC',
         country: c
         topic  : t
       @mcView = new MCView
         model: new SpeakersList,
         topic     : t
-        time_tot  : $("#motion-mc-total-time").html()
-        time_each : $("#motion-mc-each-time").html()
+        time_tot  : $('#motion-mc-total-time').html()
+        time_each : $('#motion-mc-each-time').html()
       @mcView.model.push c
       success $.t('motion.passBefore') + $.t('motion.mc') + $.t('motion.passAfter')
       @destroy()
@@ -402,9 +409,9 @@ jQuery ->
   class MotionUMCView extends MotionBase
     pass: ->
       tlog 'motionUMC',
-        country: $("#motion-country").html()
+        country: $('#motion-country').html()
       @umcView = new UMCView
-        time: $("#motion-umc-time").html()
+        time: $('#motion-umc-time').html()
       success $.t('motion.passBefore') + $.t('motion.umc') + $.t('motion.passAfter')
       @destroy()
 
@@ -416,13 +423,13 @@ jQuery ->
         error $.t 'error.noGSL'
         return
     pass: ->
-      t = $("#motion-gsl-time").html()
+      t = $('#motion-gsl-time').html()
       controlView.gsl.set 'time': t
       success $.t('changeGSLTime.success', t: t)
       @destroy()
 
   class StatsView extends Backbone.View
-    el: $ "#dl-session-stats"
+    el: $ '#dl-session-stats'
     initialize: ->
       @listenTo Master, 'change:sessionStats', @render
     render: ->
@@ -433,7 +440,7 @@ jQuery ->
       @
 
   class IdleView extends Backbone.View
-    el: $ "#main-activity"
+    el: $ '#main-activity'
     initialize: ->
       Master.register @, $.t('idle.idle'), 'idle'
       @render()
@@ -454,7 +461,7 @@ jQuery ->
     model: Item
 
   class TimelineView extends Backbone.View
-    el: $ "#timeline"
+    el: $ '#timeline'
     initialize: ->
       @listenTo timeline, 'add', @add
       @render()
@@ -464,15 +471,15 @@ jQuery ->
       @$el.append '<li class="nav-header">' + s + '</li>\n'
 
   class WelcomeView extends Backbone.View
-    el: $ "#welcome-container"
+    el: $ '#welcome-container'
     message: -> $.t 'prompt.defaultGlobal'
     events:
-      "click #btn-welcome-hide": "unrender"
+      'click #btn-welcome-hide': 'unrender'
     initialize: ->
       @render()
     render: ->
       @$el.fadeIn 1000
-      $("#welcome-title").html @message
+      $('#welcome-title').html @message
       log 'WelcomeView entered', DEBUG
     unrender: ->
       @$el.fadeOut 1000
@@ -562,11 +569,11 @@ jQuery ->
       if not (window.File && window.FileReader && window.FileList && window.Blob)
         warn 'XML File Processing Function not available.'
     render: (name, cls) ->
-      $("#main-activity-name").html Master.get('ongoing').name
-      $("#main-wrapper").addClass Master.get('ongoing').cls
+      $('#main-activity-name').html Master.get('ongoing').name
+      $('#main-wrapper').addClass Master.get('ongoing').cls
     unrender: (cls) ->
-      $("#main-wrapper").removeClass cls
-      $("#main-activity").html ''
+      $('#main-wrapper').removeClass cls
+      $('#main-activity').html ''
     renderTitle: ->
       s = Master.get 'sessionInfo'
       h = '<span id="session-id">'
@@ -575,13 +582,18 @@ jQuery ->
       h += '<span id="session-topic">'
       h += s.topic
       h += '</span>'
-      $("#session-title").html h
+      $('#session-title').html h
       h = s.committee + " (#{s.abbr})"
-      $("#committee").html h
+      $('#committee').html h
     renderVars: ->
       vars = Master.get('variables')
-      log "> Global variables applied.", DEBUG
-    enable: (id) ->
+      log '> Global variables applied.', DEBUG
+    enable: (arr) ->
+      if $.isArray arr
+        @_enable i for i in arr
+      else
+        @_enable arr
+    _enable: (id) ->
       $('#' + id).removeAttr 'disabled'
       log id + ' enabled', DEBUG
     disable: (id) ->
@@ -611,7 +623,7 @@ jQuery ->
   initModal = new InitModalView()
   settModal = new SettingsModalView()
 
-  $(".xe").editable
+  $('.xe').editable
     mode: 'inline'
 
   Master.trigger('change:variables')
