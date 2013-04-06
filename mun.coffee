@@ -235,12 +235,11 @@ jQuery ->
       appView.enable ['btn-roll-call', 'btn-gsl', 'btn-motion', 'btn-vote']
 
   class VoteView extends BaseView
-    el: $ 'main-activity'
     initialize: ->
-      super
-      @render
+      super 'vote-view'
+      @render()
     render: ->
-      @$el.html("!!!!!")
+      @$el.html 'Hello!'
 
   class SettingsModalView extends Backbone.View
     el: $ '#modal-settings'

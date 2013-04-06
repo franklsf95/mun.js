@@ -133,7 +133,8 @@
         "gsl-view": "主发言名单",
         "mc-view": "有主持核心磋商",
         "roll-call-view": "点名",
-        "umc-view": "自由磋商"
+        "umc-view": "自由磋商",
+        "vote-view": "投票"
     },
     "welcome": {
         "chair": "主 席",
