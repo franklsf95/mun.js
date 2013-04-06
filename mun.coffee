@@ -74,7 +74,7 @@ jQuery ->
       if @get 'current' == @get('list').length - 1
         return null
       @set 'current', @get('current') + 1
-      (@get 'list')[@get 'current']
+      @get('list')[@get 'current']
 
   class BaseView extends Backbone.View
     el: $ '#main-activity'
@@ -102,7 +102,7 @@ jQuery ->
       $('#sl-add-country').tooltip
         trigger: 'focus'
       .typeahead
-        source: -> Master.get('presentList')
+        source: -> Master.get 'presentList'
       .focus()
       @
     renderCurrent: ->
@@ -126,7 +126,7 @@ jQuery ->
     enterKey: (e) ->
       if e.keyCode == 13
         c = $('#sl-add-country').val()
-        @model.push(c)
+        @model.push c
         $('#sl-add-country').val('').focus()
     nextCountry: ->
       c = @model.next()
@@ -165,7 +165,14 @@ jQuery ->
       timerView.setTime @params.time_each, @params.time_tot
     terminate: ->
       super()
-      tlog 'endMC'
+      # Rewrite the motion item
+      _mc = timeline.pop()
+      timeline.add new ItemSL
+        time: _mc.get 'time'
+        code: _mc.get 'code'
+        msg:  _mc.get 'msg'
+        sl:  @model.get 'list'
+      log timeline
       appView.enable 'btn-motion'
 
   class UMCView extends BaseView
@@ -457,18 +464,44 @@ jQuery ->
       @get('time') + ' ' + @get('msg')
 
   class ItemSL extends Item
+    defaults: ->
+      code: ''
+      msg:  ''
+      time: ''
+      type: 'sl'
+      sl:   []
+    initialize: ->
+      con = ''
+      for e in @get 'sl'
+        con += "<li>#{e}</li>"
+      @set 'content', con
+      @set 'title',   'Speakers List'
+
   class Timeline extends Backbone.Collection
     model: Item
 
   class TimelineView extends Backbone.View
     el: $ '#timeline'
+    events:
+      'click li': (e) ->
+        $(e.target).popover 'toggle'
+          html: true
     initialize: ->
       @listenTo timeline, 'add', @add
+      @listenTo timeline, 'remove', @remove
       @render()
     add: (item) ->
-      @$el.append '<li><a href="#">' + item + '</a></li>\n'
+      if item instanceof ItemSL
+        s = '<li><a href="#" data-placement="right" '
+        s += "data-content=\"#{item.get('content')}\" data-original-title=\"#{item.get('title')}\">"
+        s += item + '</a></li>\n'
+        @$el.append s
+      else
+        @$el.append '<li><a href="#">' + item + '</a></li>\n'
     addTitle: (s) ->
       @$el.append '<li class="nav-header">' + s + '</li>\n'
+    remove: ->
+      $('#timeline li').last().remove()
 
   class WelcomeView extends Backbone.View
     el: $ '#welcome-container'
@@ -488,7 +521,6 @@ jQuery ->
       @message = s
       @
     renderBtn: (s) ->
-      log s
       $('#btn-welcome-hide').html s
       @
 
