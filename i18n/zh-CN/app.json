@@ -25,10 +25,11 @@
         "motion": "动议",
         "pause": "暂停会议",
         "rollCall": "点名",
-        "save": "保存会议",
+        "save": "保存会议进度",
         "vote": "投票"
     },
     "error": {
+        "ajaxFail": "错误：AJAX 加载失败！",
         "initSessionFirst": "请先统计会议出席人数！",
         "noGSL": "主发言名单未开启！"
     },
@@ -58,7 +59,8 @@
     },
     "load": {
         "content": "会议记录（可直接输入JSON）：",
-        "fromFile": "从文件中读取：",
+        "downloadFile": ">>> 单击下载会议记录",
+        "fromFile": "从文件中读取（请将会议记录放入此 app 运行目录中）：",
         "loadToSession": "加载到当前会议",
         "read": "读取",
         "title": "加载会议记录"

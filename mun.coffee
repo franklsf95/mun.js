@@ -286,8 +286,12 @@ jQuery ->
       'click #btn-load-to-session': 'loadToSession'
     readJSON: ->
       url = $('#logfile-name').val()
-      $.getJSON url, (data) ->
-        $('#logfile-content').val JSON.stringify data, null, '\t'
+      $.ajax
+        url: url,
+        success: (data) ->
+          $('#logfile-content').val data
+        error: ->
+          $('#logfile-content').val $.t 'error.ajaxFail'
     loadToSession: ->
       o = JSON.parse $('#logfile-content').val()
       for k of o
@@ -345,7 +349,6 @@ jQuery ->
       'click #btn-motion-umc'       : 'motionUMC'
       'click #btn-motion-gsl-time'  : 'motionGSLTime'
       'click #btn-vote'             : 'initVote'
-      # 'click #btn-load'             : 'openLoad'
       'click #btn-save'             : 'saveSession'
       'change #input-xml-log'       : 'readXML'
     toggleFullscreen: ->
@@ -391,9 +394,9 @@ jQuery ->
         sessionStats: Master.get 'sessionStats'
         sessionInfo : Master.get 'sessionInfo'
         variables   : Master.get 'variables'
-      log encodeURIComponent JSON.stringify session
       uri = 'data:application/json;charset=utf8,' + encodeURIComponent JSON.stringify session, null, 4
-      $('<a download="Session Save.json" href="' + uri + '">Download</a>').appendTo '#download-area'
+      $('<a download="Session Save.json" href="' + uri + '">' + $.t('load.downloadFile') + '</a>').appendTo '#download-wrapper'
+      $('#download-wrapper').show()
     readXML: (e) ->
       file = e.target.files[0]
       reader = new FileReader()
