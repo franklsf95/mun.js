@@ -1,0 +1,41 @@
+{
+    "countryList": [
+        "China",
+        "France",
+        "Japan"
+    ],
+    "presentList": [
+        "China",
+        "France",
+        "Japan"
+    ],
+    "sessionStats": {
+        "cnt": {
+            "key": "出席国家数",
+            "value": 3
+        },
+        "m1": {
+            "key": "简单多数",
+            "value": 2
+        },
+        "m2": {
+            "key": "绝对多数",
+            "value": 3
+        },
+        "spm": {
+            "key": "20%出席数",
+            "value": 1
+        }
+    },
+    "sessionInfo": {
+        "committee": "United Nations Security Council",
+        "abbr": "UNSC",
+        "topic": "North Korean Nuclear Issue",
+        "sessionid": "1"
+    },
+    "variables": {
+        "autoFadeTime": 3000,
+        "mcDefaultTimeTotal": 300,
+        "mcDefaultTimeEach": 60
+    }
+}

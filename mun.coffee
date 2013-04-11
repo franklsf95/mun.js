@@ -279,6 +279,22 @@ jQuery ->
       tlog 'initCompleted'
       @$el.modal 'hide'
 
+  class LoadModalView extends Backbone.View
+    el: $ '#modal-load'
+    events:
+      'click #btn-load-logfile'   : 'readJSON'
+      'click #btn-load-to-session': 'loadToSession'
+    readJSON: ->
+      url = $('#logfile-name').val()
+      $.getJSON url, (data) ->
+        $('#logfile-content').val JSON.stringify data, null, '\t'
+    loadToSession: ->
+      o = JSON.parse $('#logfile-content').val()
+      for k of o
+        Master.set k, o[k]
+      appView.enable ['btn-gsl', 'btn-motion', 'btn-vote']
+      @$el.modal 'hide'
+
   class TimerView extends Backbone.View
     $t:  $ '#global-timer'
     $tt: $ '#global-timer-total'
@@ -329,6 +345,8 @@ jQuery ->
       'click #btn-motion-umc'       : 'motionUMC'
       'click #btn-motion-gsl-time'  : 'motionGSLTime'
       'click #btn-vote'             : 'initVote'
+      # 'click #btn-load'             : 'openLoad'
+      'click #btn-save'             : 'saveSession'
       'change #input-xml-log'       : 'readXML'
     toggleFullscreen: ->
       if screenfull.enabled
@@ -366,6 +384,16 @@ jQuery ->
           elem: '#tpl-motion-change-gsl-time'
     initVote: ->
       @voteView = new VoteView
+    saveSession: ->
+      session =
+        countryList : Master.get 'countryList'
+        presentList : Master.get 'presentList'
+        sessionStats: Master.get 'sessionStats'
+        sessionInfo : Master.get 'sessionInfo'
+        variables   : Master.get 'variables'
+      log encodeURIComponent JSON.stringify session
+      uri = 'data:application/json;charset=utf8,' + encodeURIComponent JSON.stringify session, null, 4
+      $('<a download="Session Save.json" href="' + uri + '">Download</a>').appendTo '#download-area'
     readXML: (e) ->
       file = e.target.files[0]
       reader = new FileReader()
@@ -653,13 +681,15 @@ jQuery ->
   controlView = new ControlView()
   initModal = new InitModalView()
   settModal = new SettingsModalView()
+  loadModal = new LoadModalView()
 
   $('.xe').editable
     mode: 'inline'
 
   Master.trigger('change:variables')
   initModal.initSession()
-  controlView.initRollCall()
   welcomeView.unrender()
+  $('#modal-load').modal 'show'
+  loadModal.readJSON()
 
   return

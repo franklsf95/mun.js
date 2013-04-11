@@ -90,8 +90,8 @@
               <p data-i18n="prompt.rollCallNotStarted"></p>
             </dl>
           </div><!-- /stats-wrapper -->
-          
-          <a download="somedata.csv" href="data:application/csv;charset=utf-8,Col1%2CCol2%2CCol3%0AVal1%2CVal2%2CVal3%0AVal11%2CVal22%2CVal33%0AVal111%2CVal222%2CVal333">Test CSV Download File</a>
+
+          <div id="download-area"></div>
 
         </div> <!-- /sidebar-wrapper -->
       </div> <!-- /row -->
@@ -112,10 +112,10 @@
         </div>
         <button class="btn btn-primary" id="btn-vote" data-i18n="control.vote" disabled></button>
         <button class="btn btn-primary" id="btn-toggle-fullscreen">Fullscreen Mode (⇧⌘F)</button>
-        <button class="btn btn-primary" id="btn-pause">Pause Session</button>
+        <button class="btn btn-primary" id="btn-pause" data-i18n="control.pause">Pause Session</button>
+        <button class="btn btn-primary" id="btn-load" data-i18n="control.load" data-toggle="modal" data-target="#modal-load"></button>
+        <button class="btn btn-primary" id="btn-save" data-i18n="control.save"></button>
         <hr>
-        <input type="file" id="input-xml-log"/>
-        <output id="xml-content"></output>
       </div> <!-- /control-wrapper -->
     </div> <!-- /container -->
 
@@ -243,6 +243,29 @@ Japan</textarea>
     <a href="#" class="btn btn-info" id="submit-init" data-i18n="btn.init"></a>
   </div>
 </div> <!-- /modal-init -->
+
+
+<div class="modal hide fade" id="modal-load">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3 data-i18n="load.title"></h3>
+  </div>
+  <div class="modal-body">
+    <div>
+      <span data-i18n="load.fromFile"></span>
+      <input id="logfile-name" type="text" value="Session Save.json">
+      <span id="btn-load-logfile" class="btn btn-success" data-i18n="load.read"></span>
+    </div>
+    <div>
+      <span data-i18n="load.content"></span>
+    </div>
+    <textarea id="logfile-content"></textarea>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal" data-i18n="btn.close"></a>
+    <a href="#" class="btn btn-primary" id="btn-load-to-session" data-i18n="load.loadToSession"></a>
+  </div>
+</div> <!-- /modal -->
 
 <script type="text/template" id="tpl-motion">
 <div class="modal fade hide modal-motion">

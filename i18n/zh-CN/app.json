@@ -21,8 +21,11 @@
     "control": {
         "gsl": "主发言名单",
         "init": "初始化",
+        "load": "加载会议记录",
         "motion": "动议",
+        "pause": "暂停会议",
         "rollCall": "点名",
+        "save": "保存会议",
         "vote": "投票"
     },
     "error": {
@@ -52,6 +55,13 @@
         "sessionid": "会期",
         "title": "初始化会议",
         "topic": "议题"
+    },
+    "load": {
+        "content": "会议记录（可直接输入JSON）：",
+        "fromFile": "从文件中读取：",
+        "loadToSession": "加载到当前会议",
+        "read": "读取",
+        "title": "加载会议记录"
     },
     "log": {
         "endMC": "有主持核心磋商结束。",
