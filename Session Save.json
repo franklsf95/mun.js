@@ -2,25 +2,32 @@
     "countryList": [
         "China",
         "France",
-        "Japan"
+        "Japan",
+        "Republic of Korea",
+        "Russia",
+        "USA",
+        "UK"
     ],
     "presentList": [
         "China",
         "France",
-        "Japan"
+        "Japan",
+        "Republic of Korea",
+        "USA",
+        "UK"
     ],
     "sessionStats": {
         "cnt": {
             "key": "出席国家数",
-            "value": 3
+            "value": 6
         },
         "m1": {
             "key": "简单多数",
-            "value": 2
+            "value": 4
         },
         "m2": {
             "key": "绝对多数",
-            "value": 3
+            "value": 5
         },
         "spm": {
             "key": "20%出席数",

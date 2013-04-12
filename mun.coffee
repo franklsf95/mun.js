@@ -173,6 +173,7 @@ jQuery ->
         msg:  _mc.get 'msg'
         sl:  @model.get 'list'
       log timeline
+      tlog 'endMC'
       appView.enable 'btn-motion'
 
   class UMCView extends BaseView
@@ -239,7 +240,12 @@ jQuery ->
       super 'vote-view'
       @render()
     render: ->
-      @$el.html 'Hello!'
+      list = Master.get 'presentList'
+      h = '<div class="voting-list">'
+      for c in list
+        h += '<div class="vote-item"><span class="vote-country">' + c + '</span><span class="vote">Neutural</span></div>'
+      h += '</div>'
+      @$el.html h
 
   class SettingsModalView extends Backbone.View
     el: $ '#modal-settings'
@@ -411,16 +417,20 @@ jQuery ->
       'click .motion-pass': 'pass'
       'click .motion-fail': 'fail'
     passVote: 'm1'
-    initialize: ->
+    initialize: (s) ->
       @render()
+      @mo = $.t s
     render: ->
       @$el.i18n()
       @$el.modal 'show'
       $('.xe').editable
         mode: 'inline'
       $('.motion-mc-pass-vote').html Master.get('sessionStats')[@passVote].value
+    passEnd: ->
+      success $.t('motion.passBefore') + @mo + $.t('motion.passAfter')
+      @destroy()
     fail: ->
-      info $.t('motion.failBefore') + $.t('motion.mc') + $.t('motion.failAfter')
+      info $.t('motion.failBefore') + @mo + $.t('motion.failAfter')
       @destroy()
     destroy: ->
       @$el.modal 'hide'
@@ -428,6 +438,8 @@ jQuery ->
       $('.modal-backdrop').remove()
 
   class MotionMCView extends MotionBase
+    initialize: ->
+      super 'motion.mc'
     pass: ->
       c = $('#motion-country').html()
       t = $('#motion-mc-topic').html()
@@ -440,25 +452,28 @@ jQuery ->
         time_tot  : $('#motion-mc-total-time').html()
         time_each : $('#motion-mc-each-time').html()
       @mcView.model.push c
-      success $.t('motion.passBefore') + $.t('motion.mc') + $.t('motion.passAfter')
-      @destroy()
+      @passEnd()
 
   class MotionUMCView extends MotionBase
+    initialize: ->
+      super 'motion.umc'
     pass: ->
       tlog 'motionUMC',
         country: $('#motion-country').html()
       @umcView = new UMCView
         time: $('#motion-umc-time').html()
-      success $.t('motion.passBefore') + $.t('motion.umc') + $.t('motion.passAfter')
-      @destroy()
+      @passEnd()
 
   class MotionChangeGSLTimeView extends MotionBase
+    initialize: ->
+      super 'motion.changeGSLTime'
     render: ->
-      super()
-      if not controlView.gsl?
-        @$el.modal 'hide'
+      log Master.get 'ongoing'
+      if Master.get('ongoing').cls != 'gsl-view'
         error $.t 'error.noGSL'
-        return
+        @destroy()
+      else
+        super()
     pass: ->
       t = $('#motion-gsl-time').html()
       controlView.gsl.set 'time': t
@@ -466,14 +481,17 @@ jQuery ->
       @destroy()
 
   class StatsView extends Backbone.View
-    el: $ '#dl-session-stats'
+    el: $ '#stats-wrapper'
+    events:
+      'click #btn-recalc': -> Master.calc()
     initialize: ->
       @listenTo Master, 'change:sessionStats', @render
+      @$dl = $ '#dl-session-stats'
     render: ->
-      @$el.html ''
+      @$dl.html ''
       arr = Master.get 'sessionStats'
       for i of arr
-        @$el.append "<dt>#{arr[i].key}</dt><dd>#{arr[i].value}</dd>"
+        @$dl.append "<dt>#{arr[i].key}</dt><dd>#{arr[i].value}</dd>"
       @
 
   class IdleView extends Backbone.View
@@ -567,7 +585,7 @@ jQuery ->
         mcDefaultTimeTotal: 300 # not-used yet
         mcDefaultTimeEach: 60   # not-used yet
     initialize: ->
-      @on 'change:presentList', @calculate
+      @on 'change:presentList', @calc
     register: (v, n, c) ->
       old = @get('ongoing')
       if not (old is null)
@@ -595,7 +613,7 @@ jQuery ->
       last.view.delegateEvents()
       @logStack true, c
       @
-    calculate: ->
+    calc: ->
       p = @get('presentList').length
       @set 'sessionStats',
         cnt:
