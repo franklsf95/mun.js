@@ -195,11 +195,11 @@ jQuery ->
 
   class RollCallView extends BaseView
     events:
-      'click #btn-roll-call-present': 'countryPresent'
-      'click #btn-roll-call-absent':  'countryAbsent'
+      'click #btn-roll-call-present': -> @next true
+      'click #btn-roll-call-absent':  -> @next false
     keys:
-      'p': 'countryPresent'
-      'a': 'countryAbsent'
+      'p': -> @next true
+      'a': -> @next false
     initialize: ->
       @current = 0
       @countryList = Master.get 'countryList'
@@ -207,28 +207,28 @@ jQuery ->
       appView.disable 'btn-roll-call'
       tlog 'rollCallStarted'
       super 'roll-call-view'
+      @renderList()
     render: ->
+      h =  '<div class="highlight-country"></div>'
+      h += '<button class="btn btn-success" id="btn-roll-call-present">' + $.t('rollCall.present') + ' (P)</button>'
+      h += '<button class="btn btn-warning" id="btn-roll-call-absent">' + $.t('rollCall.absent') + ' (A)</button>'
+      h += '<ul class="pending-country-list"></ul>'
+      @$el.html h
+      @
+    renderList: ->
       if @current == @countryList.length
         @terminate()
       else
-        h =  '<div class="highlight-country">' + this.countryList[this.current] + '</div>'
-        h += '<button class="btn btn-success" id="btn-roll-call-present">' + $.t('rollCall.present') + ' (P)</button>'
-        h += '<button class="btn btn-warning" id="btn-roll-call-absent">' + $.t('rollCall.absent') + ' (A)</button>'
-        h += '<ul class="pending-country-list">'
+        $('.highlight-country').html @countryList[@current]
+        h = ''
         h += "<li>#{c}</li>" for c in @countryList[@current + 1 .. @current + 5]
         h += '<li>...</li>'  if @current + 5 < @countryList.length
-        h += '</li>'
-      @$el.html h
-      @
-    countryPresent: ->
-      log @countryList[@current] + ' is present.', PRODUCT
-      Master.addPresentCountry @countryList[@current]
+        $('.pending-country-list').html h
+    next: (p) ->
+      log @countryList[@current] + ' is ' + (if p then 'present' else 'absent') + '.', PRODUCT
+      Master.addPresentCountry @countryList[@current] if p
       @current++
-      @render()
-    countryAbsent: ->
-      log @countryList[@current] + ' is absent.', PRODUCT
-      @current++
-      @render()
+      @renderList()
     terminate: ->
       super()
       success $.t 'prompt.rollCallCompleted'
@@ -236,16 +236,54 @@ jQuery ->
       appView.enable ['btn-roll-call', 'btn-gsl', 'btn-motion', 'btn-vote']
 
   class VoteView extends BaseView
+    events:
+      'click #vote-yes'    : 'voteYes'
+      'click #vote-no'     : 'voteNo'
+      'click #vote-abstain': 'voteAbstain'
+      'click #vote-pass'   : 'votePass'
     initialize: ->
       super 'vote-view'
-      @render()
+      @$vl = $ '.voting-list'
+      @current = 0
+      @srcPos = 0
+      @renderList()
+      @renderCurrent()
     render: ->
-      list = Master.get 'presentList'
-      h = '<div class="voting-list">'
-      for c in list
-        h += '<div class="vote-item"><span class="vote-country">' + c + '</span><span class="vote">Neutural</span></div>'
-      h += '</div>'
+      h = '<div class="highlight-country"></div><div class="btn-group">'
+      h += '<button class="btn btn-vote btn-success" id="vote-yes">' + $.t('vote.yes') + ' (Y)</button>'
+      h += '<button class="btn btn-vote btn-warning" id="vote-no">' + $.t('vote.no') + ' (N)</button>'
+      h += '<button class="btn btn-vote btn-info" id="vote-abstain">' + $.t('vote.abstain') + ' (A)</button>'
+      h += '<button class="btn btn-vote btn-primary" id="vote-pass">' + $.t('vote.pass') + ' (P)</button>'
+      h += '</div><hr /><div class="voting-list"></div>'
       @$el.html h
+    renderCurrent: ->
+      $('.highlight-country').html @list[@current]
+    renderList: ->
+      @list = Master.get 'presentList'
+      h = ''
+      for c, i in @list
+        h += '<div class="vote-item" id="vote-' + i + '"><span class="vote-country">' + c + '</span><span class="vote"></span></div>'
+      h += '<div class="empty-block"></div>' # For scroll
+      @$vl.html h
+      $('#vote-0').addClass 'voting'
+    next: (v) ->
+      $("#vote-#{@current} .vote").html $.t('vote.' + v)
+      $("#vote-#{@current}").removeClass('voting').addClass('voted ' + v)
+      @srcPos += $("#vote-#{@current} .vote-country").height()
+      @current++
+      $("#vote-#{@current}").addClass 'voting'
+      $('.voting-list').animate
+        scrollTop: @srcPos
+      log $("#vote-#{@current}").offset()
+    voteYes: ->
+      @next 'yes'
+    voteNo: ->
+      @next 'no'
+    voteAbstain: ->
+      @next 'abstain'
+    votePass: ->
+      @next 'pass'
+
 
   class SettingsModalView extends Backbone.View
     el: $ '#modal-settings'

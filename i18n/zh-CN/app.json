@@ -149,6 +149,12 @@
         "umc-view": "自由磋商",
         "vote-view": "投票"
     },
+    "vote": {
+        "abstain": "弃权",
+        "no": "反对",
+        "pass": "过",
+        "yes": "赞成"
+    },
     "welcome": {
         "chair": "主 席",
         "director": "学术指导",
