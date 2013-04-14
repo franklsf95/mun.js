@@ -140,7 +140,8 @@
         "sessionStats": "会议信息",
         "settings": "设置",
         "timeline": "时间线",
-        "timer": "计时器"
+        "timer": "计时器",
+        "voteStats": "投票统计"
     },
     "views": {
         "gsl-view": "主发言名单",

@@ -96,9 +96,14 @@
   padding: 40px 12px 10px;
   background-color: #fff;
   height: 500px;
+  margin-top: 15px;
 
   border: 1px solid #ccc;
   .border-radius(4px);
+
+  &.top {
+    margin-top: 0;
+  }
 }
 
 .wrapper-name {
@@ -118,10 +123,6 @@
   position: absolute;
   left: 500px;
   top: 70px;
-}
-
-#stats-wrapper, #control-wrapper, #download-wrapper {
-  margin-top: 15px;
 }
 
 #download-wrapper {
@@ -235,6 +236,7 @@
    Timer Module
  -----------------------------*/
 #timer-wrapper {
+  margin-top: 0 !important;
   height: 130px;
 }
 
@@ -263,13 +265,15 @@
    Statistics Module
  -----------------------------*/
 #stats-wrapper {
-  height: 200px;
+  height: 170px;
 }
 
-#dl-session-stats {
+.dl-stats {
+  margin-top: 0;
+  margin-bottom: 10px;
   > dt {
     line-height: @baseLineHeight * 1.6;
-    width: 140px;
+    width: @baseFontSize * 10;
   }
   > dd {
     font-size: @baseFontSize * 2;
@@ -431,12 +435,6 @@
   color: @blue;
 }
 
-.empty-block {
-  float: left;
-  width: 100%;
-  height: 280px;
-}
-
 .voted {
   color: @grayDarker;
   &.yes {
@@ -454,5 +452,16 @@
   width: @baseFontSize * 6.3;
 }
 
+#vote-wrapper {
+  height: 170px;
+  display: none;
 
-
+  .dl-stats {
+    &>dt {
+      width: @baseFontSize * 8;
+    }
+    &>dd {
+      margin-left: @baseFontSize * 10;
+    }
+  }
+}

@@ -235,12 +235,24 @@ jQuery ->
       tlog 'rollCallCompleted'
       appView.enable ['btn-roll-call', 'btn-gsl', 'btn-motion', 'btn-vote']
 
+  class VoteStatsView extends Backbone.View
+    el: $ 'vote-wrapper'
+    events:
+      'click #btn-recalc-vote': 'render'
+    initialize: (vl) ->
+      @votes = vl
+      @render()
+    render: ->
+      counts = _.countBy @votes, (v) -> v
+      for k, v of counts
+        $("#count-#{k}").html v
+
   class VoteView extends BaseView
     events:
-      'click #vote-yes'    : 'voteYes'
-      'click #vote-no'     : 'voteNo'
-      'click #vote-abstain': 'voteAbstain'
-      'click #vote-pass'   : 'votePass'
+      'click #btn-yes'    : 'voteYes'
+      'click #btn-no'     : 'voteNo'
+      'click #btn-abstain': 'voteAbstain'
+      'click #btn-pass'   : 'votePass'
     initialize: ->
       super 'vote-view'
       @$vl = $ '.voting-list'
@@ -248,12 +260,17 @@ jQuery ->
       @srcPos = 0
       @renderList()
       @renderCurrent()
+      $('#stats-wrapper').hide()
+      $('#vote-wrapper').show()
+      @votes = {}
+      @votes[c] = null for c in Master.get 'presentList'
+      @vv = new VoteStatsView @votes
     render: ->
       h = '<div class="highlight-country"></div><div class="btn-group">'
-      h += '<button class="btn btn-vote btn-success" id="vote-yes">' + $.t('vote.yes') + ' (Y)</button>'
-      h += '<button class="btn btn-vote btn-warning" id="vote-no">' + $.t('vote.no') + ' (N)</button>'
-      h += '<button class="btn btn-vote btn-info" id="vote-abstain">' + $.t('vote.abstain') + ' (A)</button>'
-      h += '<button class="btn btn-vote btn-primary" id="vote-pass">' + $.t('vote.pass') + ' (P)</button>'
+      h += '<button class="btn btn-vote btn-success" id="btn-yes">' + $.t('vote.yes') + ' (Y)</button>'
+      h += '<button class="btn btn-vote btn-warning" id="btn-no">' + $.t('vote.no') + ' (N)</button>'
+      h += '<button class="btn btn-vote btn-info" id="btn-abstain">' + $.t('vote.abstain') + ' (A)</button>'
+      h += '<button class="btn btn-vote btn-primary" id="btn-pass">' + $.t('vote.pass') + ' (P)</button>'
       h += '</div><hr /><div class="voting-list"></div>'
       @$el.html h
     renderCurrent: ->
@@ -263,18 +280,18 @@ jQuery ->
       h = ''
       for c, i in @list
         h += '<div class="vote-item" id="vote-' + i + '"><span class="vote-country">' + c + '</span><span class="vote"></span></div>'
-      h += '<div class="empty-block"></div>' # For scroll
       @$vl.html h
       $('#vote-0').addClass 'voting'
     next: (v) ->
+      @votes[@list[@current]] = v
+      @vv.render()
       $("#vote-#{@current} .vote").html $.t('vote.' + v)
       $("#vote-#{@current}").removeClass('voting').addClass('voted ' + v)
       @srcPos += $("#vote-#{@current} .vote-country").height()
       @current++
+      $('.highlight-country').html @list[@current]
       $("#vote-#{@current}").addClass 'voting'
-      $('.voting-list').animate
-        scrollTop: @srcPos
-      log $("#vote-#{@current}").offset()
+      $('.voting-list').animate scrollTop: @srcPos
     voteYes: ->
       @next 'yes'
     voteNo: ->
@@ -405,8 +422,8 @@ jQuery ->
     initRollCall: ->
       @rollCallView = new RollCallView()
     initGeneralSL: ->
-      @gsl = new SpeakersList()
-      @gslView = new GSLView(model: @gsl)
+      @gslView = new GSLView
+        model: new SpeakersList()
     motion: (opt) ->
       $m = tpl '#tpl-motion'
       mid = 'modal-' + uid()
@@ -526,11 +543,11 @@ jQuery ->
       @listenTo Master, 'change:sessionStats', @render
       @$dl = $ '#dl-session-stats'
     render: ->
-      @$dl.html ''
+      h = ''
       arr = Master.get 'sessionStats'
       for i of arr
-        @$dl.append "<dt>#{arr[i].key}</dt><dd>#{arr[i].value}</dd>"
-      @
+        h += "<dt>#{arr[i].key}</dt><dd>#{arr[i].value}</dd>"
+      @$dl.html h
 
   class IdleView extends Backbone.View
     el: $ '#main-activity'
