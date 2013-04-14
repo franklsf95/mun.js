@@ -244,6 +244,7 @@ jQuery ->
       @render()
     render: ->
       counts = _.countBy @votes, (v) -> v
+      counts[i] ?= 0  for i in ['yes', 'no', 'abstian', 'pass']
       for k, v of counts
         $("#count-#{k}").html v
 
@@ -263,7 +264,7 @@ jQuery ->
       $('#stats-wrapper').hide()
       $('#vote-wrapper').show()
       @votes = {}
-      @votes[c] = null for c in Master.get 'presentList'
+      @votes[c] = null  for c in Master.get 'presentList'
       @vv = new VoteStatsView @votes
     render: ->
       h = '<div class="highlight-country"></div><div class="btn-group">'
@@ -273,34 +274,51 @@ jQuery ->
       h += '<button class="btn btn-vote btn-primary" id="btn-pass">' + $.t('vote.pass') + ' (P)</button>'
       h += '</div><hr /><div class="voting-list"></div>'
       @$el.html h
-    renderCurrent: ->
-      $('.highlight-country').html @list[@current]
     renderList: ->
       @list = Master.get 'presentList'
       h = ''
       for c, i in @list
         h += '<div class="vote-item" id="vote-' + i + '"><span class="vote-country">' + c + '</span><span class="vote"></span></div>'
       @$vl.html h
-      $('#vote-0').addClass 'voting'
-    next: (v) ->
+    vote: (v) ->
       @votes[@list[@current]] = v
+      log @list[@current] + ' voted ' + v
       @vv.render()
       $("#vote-#{@current} .vote").html $.t('vote.' + v)
-      $("#vote-#{@current}").removeClass('voting').addClass('voted ' + v)
-      @srcPos += $("#vote-#{@current} .vote-country").height()
-      @current++
+      $("#vote-#{@current}").removeClass('voting').addClass 'voted ' + v
+      @next()
+    next: ->
+      if @current == @list.length - 1
+        @startRound2()
+      else if @round2 and @cur2 == @list2.length - 1
+        @terminate()
+      else
+        @srcPos += $("#vote-#{@current} .vote-country").height()
+        if @round2 then @cur2++ else @current++
+        @renderCurrent()
+    renderCurrent: ->
+      @current = _.indexOf @list, @list2[@cur2]  if @round2
       $('.highlight-country').html @list[@current]
-      $("#vote-#{@current}").addClass 'voting'
+      $("#vote-#{@current}").removeClass('voted').addClass 'voting'
       $('.voting-list').animate scrollTop: @srcPos
+    startRound2: ->
+      @round2 = true
+      @list2 = []
+      @list2.push c  for c of @votes when @votes[c] == 'pass'
+      @cur2 = 0
+      log @list
+      $('#btn-pass').attr 'disabled', 'disabled'
+      @renderCurrent()
     voteYes: ->
-      @next 'yes'
+      @vote 'yes'
     voteNo: ->
-      @next 'no'
+      @vote 'no'
     voteAbstain: ->
-      @next 'abstain'
+      @vote 'abstain'
     votePass: ->
-      @next 'pass'
-
+      @vote 'pass'
+    terminate: ->
+      log @votes
 
   class SettingsModalView extends Backbone.View
     el: $ '#modal-settings'
